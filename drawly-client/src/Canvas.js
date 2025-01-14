@@ -19,8 +19,12 @@ const DrawingCanvas = () => {
             context.beginPath()
             context.moveTo(data.x, data.y);
         })
-    socket.on("draw-end",()=>
+    socket.on("draw-end",(data)=>
         {
+            console.log(`drawing circle ${data.x} ${data.y}` )
+            context.beginPath()
+            context.arc(data.x,data.y,3,0,Math.PI*2)
+            context.fill()
             context.closePath()
         })
     socket.on("draw",(data)=>
@@ -50,9 +54,14 @@ const DrawingCanvas = () => {
     socket.emit("draw",{x:e.nativeEvent.offsetX,y: e.nativeEvent.offsetY})
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e) => {
     setIsDrawing(false);
-    socket.emit("draw-end",{})
+    const context =e.target.getContext("2d")
+    context.beginPath()
+    context.arc(e.nativeEvent.offsetX,e.nativeEvent.offsetY,3,0,Math.PI*2)
+    context.fill()
+    context.closePath()
+    socket.emit("draw-end",{x:e.nativeEvent.offsetX,y: e.nativeEvent.offsetY})
   };
 
   return (

@@ -19,9 +19,9 @@ io.on("connection",(socket)=>
             {
                 socket.broadcast.emit("draw-start",data)
             })
-        socket.on("draw-end",()=>
+        socket.on("draw-end",(data)=>
             {
-                socket.broadcast.emit("draw-end",{})
+                socket.broadcast.emit("draw-end",data)
         })
     })
 
