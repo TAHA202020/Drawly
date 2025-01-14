@@ -12,7 +12,6 @@ const DrawingCanvas = () => {
     const context = canvas.getContext('2d');
     canvas.height=window.innerHeight/2
     canvas.width=window.innerWidth/2
-    // Initialize canvas settings
     context.lineWidth = 5;
     context.lineCap = 'round';
     context.strokeStyle = 'black';
@@ -48,8 +47,9 @@ const DrawingCanvas = () => {
     const context = canvas.getContext('2d');
     context.beginPath();
     context.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-    setIsDrawing(true);
+    
     socket.emit("draw-start",{x:e.nativeEvent.offsetX,y: e.nativeEvent.offsetY})
+    setIsDrawing(true);
   };
 
   const handleMouseMove = (e) => {
@@ -63,13 +63,15 @@ const DrawingCanvas = () => {
   };
 
   const handleMouseUp = (e) => {
-    setIsDrawing(false);
+    if(!isDrawing)
+      return
     const context =e.target.getContext("2d")
     context.beginPath()
     context.arc(e.nativeEvent.offsetX,e.nativeEvent.offsetY,2.5,0,Math.PI*2)
     context.fill()
     context.closePath()
     socket.emit("draw-end",{x:e.nativeEvent.offsetX,y: e.nativeEvent.offsetY})
+    setIsDrawing(false);
   };
 
   return (
