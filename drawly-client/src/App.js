@@ -1,8 +1,18 @@
 import DrawingCanvas from "./Canvas";
+import Players from "./Players";
+import Chat from "./Chat";
 import {socket} from "./socket"
 
 function App() {
-  return (<DrawingCanvas/>
+  return (
+  <div className="flex justify-center items-center h-[100vh]">
+    <div className="flex justify-around items-grow w-full">
+      <Players/>
+      <DrawingCanvas/>
+      <Chat/>
+    </div>
+  </div>
+  
   );
 }
 

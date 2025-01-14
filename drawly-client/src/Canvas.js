@@ -5,11 +5,13 @@ const DrawingCanvas = () => {
   const [isDrawing, setIsDrawing] = useState(false);
 
 
-
+  
   useEffect(() => {
+    
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
-
+    canvas.height=window.innerHeight/2
+    canvas.width=window.innerWidth/2
     // Initialize canvas settings
     context.lineWidth = 5;
     context.lineCap = 'round';
@@ -21,7 +23,6 @@ const DrawingCanvas = () => {
         })
     socket.on("draw-end",(data)=>
         {
-            console.log(`drawing circle ${data.x} ${data.y}` )
             context.beginPath()
             context.arc(data.x,data.y,3,0,Math.PI*2)
             context.fill()
@@ -32,7 +33,14 @@ const DrawingCanvas = () => {
             context.lineTo(data.x, data.y);
             context.stroke();
         })
-    socket.on()
+
+
+    // resize canvas on window height or width change
+    window.addEventListener("resize",()=>
+          { 
+            canvas.height=window.innerHeight/2
+            canvas.width=window.innerWidth/2
+          })
   }, []);
 
   const handleMouseDown = (e) => {
@@ -58,7 +66,7 @@ const DrawingCanvas = () => {
     setIsDrawing(false);
     const context =e.target.getContext("2d")
     context.beginPath()
-    context.arc(e.nativeEvent.offsetX,e.nativeEvent.offsetY,3,0,Math.PI*2)
+    context.arc(e.nativeEvent.offsetX,e.nativeEvent.offsetY,2.5,0,Math.PI*2)
     context.fill()
     context.closePath()
     socket.emit("draw-end",{x:e.nativeEvent.offsetX,y: e.nativeEvent.offsetY})
@@ -67,7 +75,7 @@ const DrawingCanvas = () => {
   return (
     <canvas
       ref={canvasRef}
-      width={500}
+      width={"50%"}
       height={500}
       style={{ border: '1px solid black', cursor: 'crosshair' }}
       onMouseDown={handleMouseDown}
