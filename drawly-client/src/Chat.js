@@ -30,30 +30,7 @@ export default function Chat()
             Chat
         </div>
         <div className="flex-1">
-            <div className="overflow-y-scroll h-[415px] text-white" ref={chatRef}>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                <div>fezfz</div>
-                
-
-                
-            </div>
+            <div className="overflow-y-scroll h-[415px] text-white" ref={chatRef}></div>
         </div>
         <input  placeholder="your guess ..." onKeyUp={Sendchat}/>
     </div>)
