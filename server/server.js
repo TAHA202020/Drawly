@@ -2,6 +2,7 @@ const app=require("express")()
 const http=require("http").Server(app)
 const {Server}=require("socket.io")
 const Room =require("./Room")
+const { emit } = require("process")
 
 const io=new Server(http,{
     cors :{origin:"*"}
@@ -13,6 +14,7 @@ io.on("connection",(socket)=>
             let id=generateId()
             let room=new Room(id,socket.id)
             Rooms.set(id,room)
+            
             socket.emit("room-created",{id:id})
             })
         socket.on("join-room",({id})=>
@@ -21,13 +23,10 @@ io.on("connection",(socket)=>
                 if(room)
                 {
                     socket.room=room
+                    room.clients.add(socket.id)
+                    io.to(id).emit("player-joined",{client:socket.id})
                     socket.join(id)
-                    console.log(socket.id)
-                    console.log(room.owner)
-                    console.log(socket.id==room.owner)
-                    console.log("----------")
-                    
-                    socket.emit("room-info",{owner:socket.id==room.owner})
+                    socket.emit("room-info",{owner:socket.id==room.owner,clients:[...room.clients]})
                 }
                 else{
                     socket.emit("invalid-room")
@@ -46,7 +45,13 @@ io.on("connection",(socket)=>
             socket.to(socket.room.id).emit("message",{name:socket.player_name,message:data.message})
         })
         socket.on("disconnect",()=>{
-            console.log("player diconnected")
+            let room =socket.room
+            if(room)
+            {
+                room.removeClient(socket.id)
+            socket.to(room.id).emit("player-disconnected",{id:socket.id})
+        }
+        console.log(socket.id+" disconnected")
         })
     })
 

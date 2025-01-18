@@ -6,6 +6,7 @@ module.exports= class Room{
     {
         this.id=id
         this.owner=owner
+        this.clients=new Set()
     }
     async getRandomWords(limit) {
         let data=await fetch("https://random-word-api.herokuapp.com/word?number="+limit)
@@ -14,5 +15,9 @@ module.exports= class Room{
     setWordForRound(word)
     {
         this.word=word
+    }
+    removeClient(id)
+    {
+        this.clients.delete(id)
     }
 }

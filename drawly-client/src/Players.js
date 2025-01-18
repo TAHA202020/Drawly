@@ -1,17 +1,9 @@
 import { useEffect, useState } from "react"
 import { socket } from "./socket"
 
-export default function Players()
+export default function Players({players})
 {
-    const [players,setPlayers]= useState([])
-    useEffect(()=>
-        {
-            socket.on("playerConnected",()=>
-                {
-
-                })
-        },[])
     return(<div className="bg-black w-[15vw]">
-        salam
+        {players.map((value)=><div className="text-white" key={value}>{value}</div> )}
     </div>)
 }
