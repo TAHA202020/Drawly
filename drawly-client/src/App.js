@@ -3,9 +3,12 @@ import Players from "./Players";
 import Chat from "./Chat";
 import {socket} from "./socket"
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { redirect, useNavigate, useParams } from "react-router-dom";
+
+
 
 function App() {
+
   const {id}=useParams();
   const [owner,setOwner]=useState(false)
   const [loading,setLoading]=useState(true)
@@ -42,7 +45,7 @@ function App() {
   if(loading)
     return  <>Loading</>
   return (
-    <>{owner && <button>start Game</button>}
+    <>{owner && <button onClick={()=>navigate("/")}>start Game</button>}
   <div className="flex justify-center items-center h-[100vh]">
     <div className="flex justify-around h-[50vh] items-grow w-full">
       
