@@ -14,19 +14,32 @@ io.on("connection",(socket)=>
             let id=generateId()
             let room=new Room(id,socket.id)
             Rooms.set(id,room)
-            
+            room.clients.add({id:socket.id,name:data.name})
+            socket.join(id)
             socket.emit("room-created",{id:id})
             })
-        socket.on("join-room",({id})=>
+        socket.on("join-room",({room_id,username})=>
             {
-                let room =Rooms.get(id)
+                let room =Rooms.get(room_id)
                 if(room)
                 {
                     socket.room=room
-                    room.clients.add(socket.id)
-                    io.to(id).emit("player-joined",{client:socket.id})
-                    socket.join(id)
-                    socket.emit("room-info",{owner:socket.id==room.owner,clients:[...room.clients]})
+                    room.clients.add({id:socket.id,name:username})
+                    console.log(socket.id)
+                    io.to(room_id).emit("player-joined",{id:socket.id,name:username})
+                    socket.join(room_id)
+                }
+                else{
+                    socket.emit("invalid-room")
+                }
+            })
+        socket.on("get-room-info",({room_id})=>
+            {
+                let room =Rooms.get(room_id)
+                if(room)
+                {
+                    socket.room=room
+                    socket.emit("room-info",{owner:socket.id==room.owner,clients: Array.from(room.clients)})
                 }
                 else{
                     socket.emit("invalid-room")

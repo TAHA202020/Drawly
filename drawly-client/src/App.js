@@ -2,8 +2,9 @@ import DrawingCanvas from "./Canvas";
 import Players from "./Players";
 import Chat from "./Chat";
 import {socket} from "./socket"
-import { useEffect, useState } from "react";
-import { redirect, useNavigate, useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import {useNavigate, useParams } from "react-router-dom";
+import { userNameContext } from "./AppRoutes";
 
 
 
@@ -11,18 +12,21 @@ function App() {
 
   const {id}=useParams();
   const [owner,setOwner]=useState(false)
-  const [loading,setLoading]=useState(true)
   const [players,setPlayers]=useState([])
+  const usernameContext=useContext(userNameContext)
   const navigate=useNavigate()
+  
   useEffect(()=>
     {
-      socket.emit("join-room",{id:id})
+      if(usernameContext.userName=="")
+        navigate(`/?redirect=${id}`)
 
-
+      socket.emit("get-room-info",{room_id:id})
       socket.on("player-joined",(data)=>
         {
           console.log(data)
-          setPlayers([...players,data.client])
+          let newPlayers=JSON.parse(JSON.stringify(players)).push({id:data.client,name:data.name})
+          setPlayers([newPlayers])
         })
       socket.on("invalid-room",()=>
         {
@@ -30,20 +34,15 @@ function App() {
         })
       socket.on("room-info",(data)=>
         {
-          setLoading(false)
-          setOwner(data.owner)
           console.log(data.clients)
-          setPlayers(Array.from(data.clients))
           console.log(data)
+          setOwner(data.owner)
+          setPlayers(data.clients)
         })
       socket.on("player-disconnected",(data)=>
         {
         })
     },[])
-
-
-  if(loading)
-    return  <>Loading</>
   return (
     <>{owner && <button onClick={()=>navigate("/")}>start Game</button>}
   <div className="flex justify-center items-center h-[100vh]">
