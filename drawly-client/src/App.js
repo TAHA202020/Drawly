@@ -24,21 +24,19 @@ function App() {
       socket.emit("get-room-info",{room_id:id})
       socket.on("player-joined",(data)=>
         {
-          console.log(data)
-          let newPlayers=JSON.parse(JSON.stringify(players)).push({id:data.client,name:data.name})
-          setPlayers([newPlayers])
+          setPlayers((prevPlayers) => [...prevPlayers, { id: data.id, name: data.name }]);
         })
-      socket.on("invalid-room",()=>
-        {
-          navigate("/")
-        })
+      
       socket.on("room-info",(data)=>
         {
           console.log(data.clients)
-          console.log(data)
           setOwner(data.owner)
           setPlayers(data.clients)
         })
+        socket.on("invalid-room",()=>
+          {
+            navigate("/")
+          })
       socket.on("player-disconnected",(data)=>
         {
         })

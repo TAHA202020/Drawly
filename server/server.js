@@ -2,7 +2,6 @@ const app=require("express")()
 const http=require("http").Server(app)
 const {Server}=require("socket.io")
 const Room =require("./Room")
-const { emit } = require("process")
 
 const io=new Server(http,{
     cors :{origin:"*"}
@@ -14,7 +13,7 @@ io.on("connection",(socket)=>
             let id=generateId()
             let room=new Room(id,socket.id)
             Rooms.set(id,room)
-            room.clients.add({id:socket.id,name:data.name})
+            room.clients.set(socket.id,data.name)
             socket.join(id)
             socket.emit("room-created",{id:id})
             })
@@ -24,8 +23,7 @@ io.on("connection",(socket)=>
                 if(room)
                 {
                     socket.room=room
-                    room.clients.add({id:socket.id,name:username})
-                    console.log(socket.id)
+                    room.clients.set(socket.id,username)
                     io.to(room_id).emit("player-joined",{id:socket.id,name:username})
                     socket.join(room_id)
                 }
@@ -39,7 +37,9 @@ io.on("connection",(socket)=>
                 if(room)
                 {
                     socket.room=room
-                    socket.emit("room-info",{owner:socket.id==room.owner,clients: Array.from(room.clients)})
+                    let clients =Array.from(room.clients, ([id, name]) => ({ id, name }))
+                    console.log(clients)
+                    socket.emit("room-info",{owner:socket.id==room.owner,clients: clients})
                 }
                 else{
                     socket.emit("invalid-room")

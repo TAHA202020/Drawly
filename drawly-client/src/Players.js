@@ -3,6 +3,7 @@ import { socket } from "./socket"
 
 export default function Players({players})
 {
+    console.log(players)
     return(<div className="bg-black w-[15vw]">
         {players.map((value)=><div className="text-white" key={value.id}>{value.name}</div> )}
     </div>)
