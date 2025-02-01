@@ -62,25 +62,37 @@ io.on("connection",(socket)=>
             if(room)
             {
                 let transferOwnership=socket.id==room.owner
-                room.removeClient(socket.id)
-                if(transferOwnership)
+                let new_owner=room.removeClient(socket.id)
+                if(new_owner==null)
                 {
-                    io.to(room.owner).emit("transfer-ownership")
+                    Rooms.delete(room.id)
+                }
+                else
+                {
+                    if(transferOwnership)
+                        {
+                            io.to(room.owner).emit("transfer-ownership")
+                        }
+                        
                 }
                 
                 socket.to(room.id).emit("player-disconnected",{id:socket.id})
             }
-            console.log(socket.id+" disconnected")
+            console.log(Rooms.size)
         })
-        //game Login in here
+        //game Logic in here
 
         socket.on("start-game",async ()=>{
             let room=socket.room
-            if(room.owner==socket.id)
+            if(!room.owner==socket.id)
             {
-                await room.getRandomWords(3)
-                io.to(room.id).emit("start-timer")
+                return
             }
+            await room.getRandomWords(3)
+            let drawer=room.getDrawer()
+
+            io.to(drawer).emit("word",{word:room.word})
+            io.to(room.id).emit("start-timer")
         })  
     })
 
