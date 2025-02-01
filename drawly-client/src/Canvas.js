@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { socket } from './socket';
-const DrawingCanvas = () => {
+const DrawingCanvas = ({canDraw}) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
@@ -43,6 +43,8 @@ const DrawingCanvas = () => {
   }, []);
 
   const handleMouseDown = (e) => {
+    if(!canDraw)
+      return
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
     context.beginPath();

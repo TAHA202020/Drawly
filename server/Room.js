@@ -10,6 +10,7 @@ module.exports= class Room{
     }
     async getRandomWords(limit) {
         let data=await fetch("https://random-word-api.herokuapp.com/word?number="+limit)
+        data=await data.json()
         console.log(data)
     }
     setWordForRound(word)
@@ -19,5 +20,9 @@ module.exports= class Room{
     removeClient(id)
     {
         this.clients.delete(id)
+        if(this.owner==id)
+        {
+            this.owner=this.clients.keys().next().value
+        }
     }
 }

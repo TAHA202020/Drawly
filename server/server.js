@@ -61,11 +61,27 @@ io.on("connection",(socket)=>
             let room =socket.room
             if(room)
             {
+                let transferOwnership=socket.id==room.owner
                 room.removeClient(socket.id)
-            socket.to(room.id).emit("player-disconnected",{id:socket.id})
-        }
-        console.log(socket.id+" disconnected")
+                if(transferOwnership)
+                {
+                    io.to(room.owner).emit("transfer-ownership")
+                }
+                
+                socket.to(room.id).emit("player-disconnected",{id:socket.id})
+            }
+            console.log(socket.id+" disconnected")
         })
+        //game Login in here
+
+        socket.on("start-game",async ()=>{
+            let room=socket.room
+            if(room.owner==socket.id)
+            {
+                await room.getRandomWords(3)
+                io.to(room.id).emit("start-timer")
+            }
+        })  
     })
 
 function generateId() {
