@@ -19,6 +19,7 @@ function App() {
   const [time, setTime] = useState(0);
   const [word,setWord]=useState([]);
   const  [gamenotStarted,setGamenotStarted]=useState(true);
+  const [playerSelectingWord,setPlayerSelectingWord]=useState("");
   const usernameContext=useContext(userNameContext);
   const navigate=useNavigate();
   const stopTimer=()=>{
@@ -76,14 +77,19 @@ function App() {
           {
             setCanDraw(true)
           })
+        socket.on("word-selected",()=>
+          {
+            setPlayerSelectingWord("")
+          })
         socket.on("player-selecting-word",({player})=>{
-          console.log("player: "+player+" is selecting a word")
+          setPlayerSelectingWord(player)
         })
     },[]);
   return (
   <TimerContext.Provider value={{time,setTime}}>
     {owner && gamenotStarted && <button className="start-game-btn" onClick={()=>startGame()}>start Game</button>}
     {word.length>0 && <Words words={word} selectWord={selectWord}/>}
+    {playerSelectingWord!="" && <div className="words-container">{playerSelectingWord} is selecting a word</div>}
     <div className="flex justify-center items-center h-[100vh]">
       <div className="flex justify-around h-[50vh] items-grow w-full">
         <Timer  selectRandom={selectRandom}/>

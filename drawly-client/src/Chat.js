@@ -4,16 +4,17 @@ import { socket } from "./socket"
 export default function Chat()
 {
     const chatRef=useRef()
+    
     useEffect(()=>
         {
-            socket.on("message",(data)=>
-                {
-                    let element =document.createElement("div")
-                    element.innerText=data.name+" : "+data.message
-                    chatRef.current.append(element)
-                })
+        socket.on("message",(data)=>
+            {
+                let element =document.createElement("div")
+                element.innerText=data.name+" : "+data.message
+                chatRef.current.append(element)
+            })
         }
-    ,[])
+    )
     const Sendchat=(e)=>
         {
             if(!(e.keyCode==13))
@@ -23,7 +24,6 @@ export default function Chat()
             element.innerText="Me : "+e.target.value
             chatRef.current.append(element)
             e.target.value=""
-            
         }
     return(<div className="bg-black w-[15vw] flex justify-start items-stretch flex-col">
         <div className="text-white">

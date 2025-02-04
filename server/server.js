@@ -54,7 +54,7 @@ io.on("connection",(socket)=>
             socket.broadcast.emit("draw-end",data)
         })
         socket.on("message",(data)=>{
-            socket.to(socket.room.id).emit("message",{name:socket.player_name,message:data.message})
+            socket.to(socket.room.id).emit("message",{name:socket.room.clients.get(socket.id),message:data.message})
         })
         socket.on("disconnect",()=>{
             let room =socket.room
@@ -100,6 +100,12 @@ io.on("connection",(socket)=>
             let room=socket.room
             room.word=word
             io.to(room.drawer).emit("permission-to-draw")
+            room.clients.forEach((name,id)=>{
+                if(id!=room.drawer)
+                {
+                    io.to(id).emit("word-selected")
+                }
+            })
         })
     })
 
