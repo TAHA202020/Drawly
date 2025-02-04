@@ -11,8 +11,7 @@ module.exports= class Room{
     async getRandomWords(limit) {
         let data=await fetch("https://random-word-api.herokuapp.com/word?number="+limit)
         data=await data.json()
-        this.setWordForRound(data[0])
-        console.log(data)
+        return data
     }
     setWordForRound(word)
     {
@@ -35,6 +34,7 @@ module.exports= class Room{
     }
     getDrawer()
     {
-        return this.clients.keys().next().value
+        this.drawer=this.clients.keys().next().value
+        return this.drawer
     }
 }

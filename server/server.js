@@ -88,12 +88,22 @@ io.on("connection",(socket)=>
             {
                 return
             }
-            await room.getRandomWords(3)
+            let words=await room.getRandomWords(3)
             let drawer=room.getDrawer()
-
-            io.to(drawer).emit("word",{word:room.word})
-            io.to(room.id).emit("start-timer")
-        })  
+            io.to(drawer).emit("word-to-draw",{words:words})
+            room.clients.forEach((name,id)=>{
+                if(id!=drawer)
+                {
+                    io.to(id).emit("player-selecting-word",{player:name})
+                }
+            })
+        })
+        socket.on("selected-word",({word})=>{
+            console.log(word)
+            let room=socket.room
+            room.word==word
+            socket.to(room.id).emit("word-selected")
+        })
     })
 
 function generateId() {

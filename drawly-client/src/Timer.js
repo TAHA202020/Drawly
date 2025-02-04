@@ -1,30 +1,29 @@
-import { useEffect,useState } from "react";
+import { useContext, useEffect,useState } from "react";
 import { socket } from "./socket";
+import { TimerContext } from "./App";
 
-export default function Timer() 
+export default function Timer({selectRandom}) 
 {
     
-    const [time, setTime] = useState(60);
-    const [timerOn, setTimerOn] = useState(false);
+    const timerContext=useContext(TimerContext)
     useEffect(() => {
-        socket.on("start-timer",()=>
-            {
-                setTimerOn(true)
-    
-            })
         let interval = null;
-        if (timerOn && time >= 0) {
+        if (timerContext.time > 0) {
             interval = setInterval(() => {
-                setTime((prevTime) => prevTime - 1);
+                timerContext.setTime((prevTime) => {
+                    if(prevTime==1)
+                    {
+                        selectRandom()
+                    }
+                    return prevTime - 1});
             }, 1000);
         } else {
             clearInterval(interval);
         }
         return () => clearInterval(interval);
-    }, [timerOn]);
-    return (
-        <div>
-            <h1>{time}</h1>
-        </div>
+    }, [timerContext.time]);
+    return (<>
+    {timerContext.time>0 && <h1>{timerContext.time}</h1>}
+    </>
     );
 }
