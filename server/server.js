@@ -38,7 +38,6 @@ io.on("connection",(socket)=>
                 {
                     socket.room=room
                     let clients =Array.from(room.clients, ([id, name]) => ({ id, name }))
-                    console.log(clients)
                     socket.emit("room-info",{owner:socket.id==room.owner,clients: clients})
                 }
                 else{
@@ -78,7 +77,6 @@ io.on("connection",(socket)=>
                 
                 socket.to(room.id).emit("player-disconnected",{id:socket.id})
             }
-            console.log(Rooms.size)
         })
         //game Logic in here
 
@@ -99,10 +97,9 @@ io.on("connection",(socket)=>
             })
         })
         socket.on("selected-word",({word})=>{
-            console.log(word)
             let room=socket.room
-            room.word==word
-            socket.to(room.id).emit("word-selected")
+            room.word=word
+            io.to(room.drawer).emit("permission-to-draw")
         })
     })
 

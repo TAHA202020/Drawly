@@ -18,10 +18,12 @@ function App() {
   const [canDraw,setCanDraw]=useState(false);
   const [time, setTime] = useState(0);
   const [word,setWord]=useState([]);
+  const  [gamenotStarted,setGamenotStarted]=useState(true);
   const usernameContext=useContext(userNameContext);
   const navigate=useNavigate();
   const stopTimer=()=>{
     setTime(0)
+    setWord([])
   }
   const selectRandom=useCallback((()=>
     {
@@ -35,6 +37,7 @@ function App() {
     })
 
   const startGame=()=>{
+    setGamenotStarted(false)
     socket.emit("start-game")
   }
 
@@ -69,14 +72,17 @@ function App() {
             setWord(data.words)
             setTime(10)
           })
-
+        socket.on("permission-to-draw",()=>
+          {
+            setCanDraw(true)
+          })
         socket.on("player-selecting-word",({player})=>{
           console.log("player: "+player+" is selecting a word")
         })
     },[]);
   return (
   <TimerContext.Provider value={{time,setTime}}>
-    {owner && <button onClick={()=>startGame()}>start Game</button>}
+    {owner && gamenotStarted && <button className="start-game-btn" onClick={()=>startGame()}>start Game</button>}
     {word.length>0 && <Words words={word} selectWord={selectWord}/>}
     <div className="flex justify-center items-center h-[100vh]">
       <div className="flex justify-around h-[50vh] items-grow w-full">

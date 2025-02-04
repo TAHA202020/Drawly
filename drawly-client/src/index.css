@@ -23,35 +23,39 @@
 }
 
 
-/* CSS */
-.button-1 {
-  background-color: #EA4C89;
-  border-radius: 8px;
-  border-style: none;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  display: inline-block;
-  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  height: 40px;
-  line-height: 20px;
-  list-style: none;
-  margin: 0;
-  outline: none;
-  padding: 10px 16px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  transition: color 100ms;
-  vertical-align: baseline;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
+.start-game-btn
+{
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-100%);
+  border: 1px solid black;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: bold;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
-
-.button-1:hover,
-.button-1:focus {
-  background-color: #F082AC;
+.words-container
+{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7%;
+  position: absolute;
+  height:100vh;
+  width: 100vw;
+  background-color: rgba(85, 85, 85, 0.9);
+}
+.word
+{
+  font-size: large;
+  font-weight: bold;
+  color: white;
+  border: 2px solid white;
+  padding: 5px;
+}
+.word:hover{
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
 }
