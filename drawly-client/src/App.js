@@ -17,20 +17,24 @@ function App() {
   const [players,setPlayers]=useState([]);
   const [canDraw,setCanDraw]=useState(false);
   const [time, setTime] = useState(0);
+  const [timercallback,setTimerCallback]=useState(null);
   const [word,setWord]=useState([]);
+  const [wordToDraw,setWordToDraw]=useState("");
   const  [gamenotStarted,setGamenotStarted]=useState(true);
   const [playerSelectingWord,setPlayerSelectingWord]=useState("");
+  const [wordLength,setWordLength]=useState(0);
   const usernameContext=useContext(userNameContext);
   const navigate=useNavigate();
   const stopTimer=()=>{
     setTime(0)
     setWord([])
   }
-  const selectRandom=useCallback((()=>
+  const selectRandom=()=>
     {
+      console.log("selecting random word")
       socket.emit("selected-word",{word:word[Math.floor(Math.random()*word.length)]})
       stopTimer()   
-    }))
+    }
   const selectWord=useCallback((word)=>
     {
       socket.emit("selected-word",{word})   
@@ -72,27 +76,34 @@ function App() {
           {
             setWord(data.words)
             setTime(10)
+            setTimerCallback(()=>selectRandom)
           })
-        socket.on("permission-to-draw",()=>
+        socket.on("permission-to-draw",({word})=>
           {
             setCanDraw(true)
+            setWordToDraw(word)
           })
-        socket.on("word-selected",()=>
+        socket.on("word-selected",({word_Length})=>
           {
             setPlayerSelectingWord("")
+            setWordLength(word_Length)
+            
           })
         socket.on("player-selecting-word",({player})=>{
           setPlayerSelectingWord(player)
         })
     },[]);
   return (
-  <TimerContext.Provider value={{time,setTime}}>
+  <TimerContext.Provider value={{time,setTime,timercallback}}>
     {owner && gamenotStarted && <button className="start-game-btn" onClick={()=>startGame()}>start Game</button>}
     {word.length>0 && <Words words={word} selectWord={selectWord}/>}
     {playerSelectingWord!="" && <div className="words-container">{playerSelectingWord} is selecting a word</div>}
+    
     <div className="flex justify-center items-center h-[100vh]">
-      <div className="flex justify-around h-[50vh] items-grow w-full">
-        <Timer  selectRandom={selectRandom}/>
+      <div className="flex justify-around h-[50vh] items-grow w-full relative">
+        {wordToDraw!="" && <div className="word-todraw">{wordToDraw}</div>}
+        {wordLength>0 && <div className="word-todraw">{wordLength}</div>}
+        <Timer/>
         <Players players={players}/>
         <DrawingCanvas canDraw={canDraw}/>
         <Chat/>

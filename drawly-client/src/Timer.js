@@ -1,8 +1,7 @@
 import { useContext, useEffect,useState } from "react";
-import { socket } from "./socket";
 import { TimerContext } from "./App";
 
-export default function Timer({selectRandom}) 
+export default function Timer() 
 {
     
     const timerContext=useContext(TimerContext)
@@ -13,7 +12,7 @@ export default function Timer({selectRandom})
                 timerContext.setTime((prevTime) => {
                     if(prevTime==1)
                     {
-                        selectRandom()
+                        timerContext.timercallback()
                     }
                     return prevTime - 1});
             }, 1000);

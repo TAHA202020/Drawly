@@ -99,11 +99,11 @@ io.on("connection",(socket)=>
         socket.on("selected-word",({word})=>{
             let room=socket.room
             room.word=word
-            io.to(room.drawer).emit("permission-to-draw")
+            io.to(room.drawer).emit("permission-to-draw",{word})
             room.clients.forEach((name,id)=>{
                 if(id!=room.drawer)
                 {
-                    io.to(id).emit("word-selected")
+                    io.to(id).emit("word-selected",{lenght:word.length})
                 }
             })
         })
