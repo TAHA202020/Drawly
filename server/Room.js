@@ -4,6 +4,7 @@ const fetch = require("node-fetch")
 module.exports= class Room{
     constructor(id,owner)
     {
+        this.timeOut=null;
         this.id=id
         this.owner=owner
         this.clients=new Map()
@@ -36,5 +37,9 @@ module.exports= class Room{
     {
         this.drawer=this.clients.keys().next().value
         return this.drawer
+    }
+    createTimeout(callback,time)
+    {
+        this.timeOut=setTimeout(callback,time)
     }
 }

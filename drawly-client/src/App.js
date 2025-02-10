@@ -7,6 +7,7 @@ import {useNavigate, useParams } from "react-router-dom";
 import { userNameContext } from "./AppRoutes";
 import Timer from "./Timer";
 import Words from "./Words";
+import GuessWord from "./GuessWord";
 
 export const TimerContext=createContext("")
 
@@ -81,12 +82,16 @@ function App() {
         socket.on("permission-to-draw",({word})=>
           {
             setCanDraw(true)
+            setTime(50)
+            setTimerCallback(null)
             setWordToDraw(word)
           })
-        socket.on("word-selected",({word_Length})=>
+        socket.on("word-selected",({lenght})=>
           {
             setPlayerSelectingWord("")
-            setWordLength(word_Length)
+            setWordLength(lenght)
+            setTime(50)
+            setTimerCallback(null)
             
           })
         socket.on("player-selecting-word",({player})=>{
@@ -101,8 +106,8 @@ function App() {
     
     <div className="flex justify-center items-center h-[100vh]">
       <div className="flex justify-around h-[50vh] items-grow w-full relative">
-        {wordToDraw!="" && <div className="word-todraw">{wordToDraw}</div>}
-        {wordLength>0 && <div className="word-todraw">{wordLength}</div>}
+        {wordToDraw!="" && <h1 className="word-todraw text-large">{wordToDraw}</h1>}
+        {wordLength>0 && <GuessWord length={wordLength}/>}
         <Timer/>
         <Players players={players}/>
         <DrawingCanvas canDraw={canDraw}/>

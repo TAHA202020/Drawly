@@ -103,9 +103,11 @@ io.on("connection",(socket)=>
             room.clients.forEach((name,id)=>{
                 if(id!=room.drawer)
                 {
-                    io.to(id).emit("word-selected",{lenght:word.length})
-                }
-            })
+                    io.to(id).emit("word-selected",{lenght:word.length ,round_TimeEnd:50})
+                }})
+            room.createTimeout(()=>{
+                io.to(room.id).emit("round-end")
+            },50000)
         })
     })
 
