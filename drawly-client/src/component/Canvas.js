@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { socket } from './socket';
+import { socket } from '../utils/socket';
 const DrawingCanvas = () => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
