@@ -3,17 +3,19 @@ import { socket } from "../utils/socket"
 import logo from "../assets/logo.png" 
 import {useNavigate, useSearchParams} from "react-router-dom"
 import { GameContext } from "../context/GameContext"
+import { UserContext } from "../context/UserContext"
 
 export default function Lobby()
 {
     const {game,setGame}=useContext(GameContext)
+    const {user,setUser}=useContext(UserContext)
     const [id]=useSearchParams()
     const navigate=useNavigate()
     useEffect(()=>
         {
             socket.on("room-joined",(data)=>
                 {
-                    console.log(data)
+                    setUser({id:socket.id,username:data.user})
                     setGame(data)
                     navigate(`/${data.room_id}`)
                 })

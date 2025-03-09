@@ -18,7 +18,7 @@ io.on("connection",(socket)=>
                 room.PlayerJoin(socket.id,data.username)
                 socket.room=room
                 socket.join(id)
-                socket.emit("room-joined",{room_id:id, owner:true , players:Array.from(room.players.entries()), Drawer:{Drawing:false,Word:""},Word_Lenght:0})
+                socket.emit("room-joined",{room_id:id, owner:true , players:Array.from(room.players.entries()), Drawer:{Drawing:false,Word:""},Word_Lenght:0,user:data.username})
             }
             else if(Rooms.get(data.room_id))
             {
