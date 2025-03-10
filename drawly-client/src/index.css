@@ -111,5 +111,25 @@
   /* end lobby css */
   .player
   {
-    color: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgb(211, 211, 211);
+  }
+  .player-img
+  {
+    height: 35px;
+  }
+  .player-name
+  {
+    font-size: 1.05rem;
+    font-weight:bold;
+  }
+  .player-container
+  {
+    border: 1px solid rgb(238, 238, 238);
+    background-color: white;
+    border-radius: 5px;
+    overflow: hidden;
   }

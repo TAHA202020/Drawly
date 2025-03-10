@@ -3,16 +3,15 @@ import Players from "./Players";
 import Chat from "./Chat";
 import { useContext, useEffect } from "react";
 import { UserContext } from "../context/UserContext";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 function Game() {
   const {user}=useContext(UserContext);
+  const location =useLocation();
   const navigate =useNavigate();
   useEffect(() => {
-    console.log(user)
     if(user===null){
-      navigate("/")
+      navigate("/?id="+location.pathname.slice(1));
     }
-
   }, []);
   return (
   <div className="flex justify-center items-center h-[100vh]">

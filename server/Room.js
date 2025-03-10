@@ -12,4 +12,8 @@ module.exports= class Room{
     {
         this.players.set(id,username)
     }
+    PlayerLeave(id)
+    {
+        this.players.delete(id)
+    }
 }

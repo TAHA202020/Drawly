@@ -9,6 +9,7 @@ const io=new Server(http,{
 const Rooms=new Map()
 io.on("connection",(socket)=>
     {
+        socket.room=null
         socket.on("create-room",(data)=>{
             if(data.room_id===null)
             {
@@ -22,7 +23,13 @@ io.on("connection",(socket)=>
             }
             else if(Rooms.get(data.room_id))
             {
-
+                let room=Rooms.get(data.room_id)
+                room.PlayerJoin(socket.id,data.username)
+                socket.room=room
+                io.to(data.room_id).emit("player-joined",[socket.id,data.username])
+                socket.join(data.room_id)
+                socket.emit("room-joined",{room_id:data.room_id, owner:false , players:Array.from(room.players.entries()), Drawer:{Drawing:false,Word:""},Word_Lenght:0,user:data.username})
+                
             }
             else
             {
@@ -42,7 +49,12 @@ io.on("connection",(socket)=>
             socket.to(socket.room.id).emit("message",{name:socket.player_name,message:data.message})
         })
         socket.on("disconnect",()=>{
-            console.log("player diconnected")
+            if(socket.room!==null)
+            {
+                io.to(socket.room.id).emit("player-left",{playerId:socket.id})
+                socket.room.PlayerLeave(socket.id)
+                socket.room=null
+            }
         })
     })
 
