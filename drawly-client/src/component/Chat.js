@@ -1,37 +1,44 @@
-import { useEffect, useRef } from "react"
-import { socket } from "../utils/socket"
+import { useState, useEffect, useRef, useContext } from "react";
+import { socket } from "../utils/socket";
+import { UserContext } from "../context/UserContext";
 
-export default function Chat()
-{
-    const chatRef=useRef()
-    useEffect(()=>
-        {
-            socket.on("message",(data)=>
-                {
-                    let element =document.createElement("div")
-                    element.innerText=data.name+" : "+data.message
-                    chatRef.current.append(element)
-                })
-        }
-    ,[])
-    const Sendchat=(e)=>
-        {
-            if(!(e.keyCode==13))
-                return
-            socket.emit("message",({message:e.target.value}))
-            let element =document.createElement("div")
-            element.innerText="Me : "+e.target.value
-            chatRef.current.append(element)
-            e.target.value=""
-            
-        }
-    return(<div className="bg-black w-[15vw] flex justify-start items-stretch flex-col">
-        <div className="text-white">
-            Chat
-        </div>
-        <div className="flex-1">
-            <div className="overflow-y-scroll h-[415px] text-white" ref={chatRef}></div>
-        </div>
-        <input  placeholder="your guess ..." onKeyUp={Sendchat}/>
-    </div>)
+export default function Chat() {
+  const [messages, setMessages] = useState([]); // State to store chat messages
+  const chatRef = useRef();
+  const {user}=useContext(UserContext)
+  useEffect(() => {
+    socket.on("message", (data) => {
+      setMessages((prevMessages) => [...prevMessages, data]);
+    });
+  }, []);
+
+  const Sendchat = (e) => {
+    if (e.keyCode !== 13) return; // Send on Enter key
+
+    const message = e.target.value;
+    socket.emit("message", {name:user.username,message: message }); // Emit message to the server
+    setMessages((prevMessages) => [...prevMessages, { name: "Me", message }]); // Update state with new message
+    e.target.value = ""; // Clear input field
+  };
+
+  // Scroll to bottom when new messages are added
+  useEffect(() => {
+    chatRef.current.scrollTop = chatRef.current.scrollHeight;
+  }, [messages]);
+
+  return (
+    <div className="bg-black w-[15vw] flex flex-col h-full">
+      <div className="text-white p-2 border-b border-gray-600">Chat</div>
+      <div className="flex-1 overflow-y-auto p-2 text-white" ref={chatRef}>
+        {messages.map((msg, index) => (
+          <div key={index} className="py-1">{msg.name} : {msg.message}</div>
+        ))}
+      </div>
+      <input
+        placeholder="your guess ..."
+        className="p-2 border-t border-gray-600 bg-gray-800 text-white outline-none"
+        onKeyUp={Sendchat}
+      />
+    </div>
+  );
 }

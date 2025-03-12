@@ -1,27 +1,140 @@
 import DrawingCanvas from "./Canvas";
 import Players from "./Players";
 import Chat from "./Chat";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import { useLocation, useNavigate } from "react-router-dom";
+import { GameContext } from "../context/GameContext";
+import { socket } from "../utils/socket";
+
 function Game() {
-  const {user}=useContext(UserContext);
-  const location =useLocation();
-  const navigate =useNavigate();
+  const { game, setGame } = useContext(GameContext);
+  const { user } = useContext(UserContext);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [drawerChoosing, setDrawerChoosing] = useState(false);
+  const [wordToChoose, setWordToChoose] = useState([]);
+  const [wordChosen, setWordChosen] = useState(null);
+  const [wordLength, setWordLength] = useState(null);
+
   useEffect(() => {
-    if(user===null){
-      navigate("/?id="+location.pathname.slice(1));
+    if (user === null) {
+      navigate("/?id=" + location.pathname.slice(1));
     }
+
+    socket.on("player-joined", (data) => {
+      setGame((prevGame) => ({
+        ...prevGame,
+        players: [...prevGame.players, data],
+      }));
+    });
+
+    socket.on("player-left", (data) => {
+      setGame((prevGame) => ({
+        ...prevGame,
+        players: prevGame.players.filter((player) => player[0] !== data.playerId),
+      }));
+    });
+
+    socket.on("ownership", (data) => {
+      setGame((prev) => ({ ...prev, owner: data.owner }));
+    });
+
+    socket.on("words-choosing", (data) => {
+      if (data.gameStarted) {
+        setGame((prev) => ({ ...prev, gameStarted: true }));
+      }
+      setWordToChoose(data.words);
+    });
+
+    socket.on("drawer-choosing", (data) => {
+      if (data.gameStarted) {
+        setGame((prev) => ({ ...prev, gameStarted: true }));
+      }
+      setDrawerChoosing(true);
+    });
+
+    socket.on("gameStarted", () => {
+      setGame((prev) => ({ ...prev, gameStarted: true }));
+    });
+
+    socket.on("wordChosen", (data) => {
+      setWordChosen(data.word);
+      setWordToChoose([]);
+    });
+
+    socket.on("wordLength", (data) => {
+      setWordLength(data.wordLenght);
+      setDrawerChoosing(false);
+    });
+
   }, []);
+
+  const handleWordChoice = (word) => {
+    socket.emit("wordChosen", word);
+  };
+
+  if (!game) return <>Loading...</>;
+
   return (
-  <div className="flex justify-center items-center h-[100vh]">
-    <div className="flex justify-around h-[50vh] items-grow w-full">
-      
-      <Players/>
-      <DrawingCanvas/>
-      <Chat/>
+    <div className="flex justify-center items-center h-screen relative">
+      {/* Game UI */}
+      {game.gameStarted ? (
+        <div className="flex flex-col justify-center items-center w-full h-full relative">
+          {/* Word Display Box */}
+          {wordChosen || wordLength ? (
+            <div className="absolute top-4 bg-gray-900 bg-opacity-80 text-white px-6 py-2 rounded-lg text-2xl font-semibold">
+              {wordChosen ? wordChosen : "_ ".repeat(wordLength)}
+            </div>
+          ) : null}
+
+          <div className="flex justify-center items-start gap-5 w-full">
+            <Players players={game.players} />
+            <DrawingCanvas />
+            <Chat />
+          </div>
+
+          {/* Word Selection UI for Drawer - Fullscreen Overlay */}
+          {wordToChoose.length > 0 && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md h-full w-full z-50">
+              <div className="bg-white bg-opacity-80 p-6 rounded-xl shadow-lg text-center">
+                <h2 className="text-lg font-bold mb-4">Pick a word to draw</h2>
+                <div className="flex gap-3">
+                  {wordToChoose.map((word, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleWordChoice(word)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition"
+                    >
+                      {word}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Waiting Overlay for Non-Drawer Players - Fullscreen Overlay */}
+          {drawerChoosing && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md h-full w-full z-40">
+              <p className="text-white text-2xl font-semibold">Waiting for the drawer to choose a word...</p>
+            </div>
+          )}
+        </div>
+      ) : game.owner ? (
+        <div>
+          <p>You are the owner. Click to start the game.</p>
+          <button
+            onClick={() => socket.emit("gameStarted")}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Start Game
+          </button>
+        </div>
+      ) : (
+        <div>Waiting for the owner to start the game...</div>
+      )}
     </div>
-  </div>
   );
 }
 

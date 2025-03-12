@@ -119,12 +119,12 @@
   }
   .player-img
   {
-    height: 35px;
+    height: 20px;
   }
   .player-name
   {
-    font-size: 1.05rem;
-    font-weight:bold;
+    font-size: 0.9rem;
+    font-weight:400;
   }
   .player-container
   {
@@ -133,3 +133,15 @@
     border-radius: 5px;
     overflow: hidden;
   }
+
+  .palette
+  {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    transform: translateY(150%);
+  }
+.palette-color
+{
+  border: 1px solid black;
+}
