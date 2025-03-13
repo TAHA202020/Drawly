@@ -19,16 +19,16 @@ io.on("connection",(socket)=>
                 room.PlayerJoin(socket.id,data.username)
                 socket.room=room
                 socket.join(id)
-                socket.emit("room-joined",{room_id:id, owner:true , players:Array.from(room.players.entries()), drawer:room.drawer,Word_Lenght:0,user:data.username ,gameStarted:room.gameStarted})
+                socket.emit("room-joined",{room_id:id, owner:true , players:Array.from(room.players.entries()), drawer:room.drawer,user:data.username ,gameStarted:room.gameStarted, drawerChoosing:room.wordtoDraw===null,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null})
             }
             else if(Rooms.get(data.room_id))
             {
                 let room=Rooms.get(data.room_id)
                 room.PlayerJoin(socket.id,data.username)
                 socket.room=room
-                io.to(data.room_id).emit("player-joined",[socket.id,data.username])
+                socket.to(data.room_id).emit("player-joined",[socket.id,data.username])
                 socket.join(data.room_id)
-                socket.emit("room-joined",{room_id:data.room_id, owner:false , players:Array.from(room.players.entries()), drawer:room.drawer,Word_Lenght:0,user:data.username,gameStarted:room.gameStarted})
+                socket.emit("room-joined",{room_id:data.room_id, owner:false , players:Array.from(room.players.entries()), drawer:room.drawer,user:data.username,gameStarted:room.gameStarted, drawerChoosing:room.wordtoDraw===null,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null})
                 
             }
             else
@@ -58,6 +58,7 @@ io.on("connection",(socket)=>
             io.to(socket.room.id).except(socket.room.drawer).emit("drawer-choosing",{gameStarted:true})
           });
           socket.on("wordChosen", (word) => {
+            socket.room.wordtoDraw=word
             socket.emit("wordChosen", {word:word});
             io.to(socket.room.id).except(socket.id).emit("wordLength", {wordLenght:word.length});
           });

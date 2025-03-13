@@ -12,10 +12,8 @@ function Game() {
   const { user } = useContext(UserContext);
   const location = useLocation();
   const navigate = useNavigate();
-  const [drawerChoosing, setDrawerChoosing] = useState(false);
   const [wordToChoose, setWordToChoose] = useState([]);
   const [wordChosen, setWordChosen] = useState(null);
-  const [wordLength, setWordLength] = useState(null);
 
   useEffect(() => {
     if (user === null) {
@@ -23,10 +21,13 @@ function Game() {
     }
 
     socket.on("player-joined", (data) => {
-      setGame((prevGame) => ({
-        ...prevGame,
-        players: [...prevGame.players, data],
-      }));
+      setGame((prevGame) => {
+        const isAlreadyAdded = prevGame.players.some(player => player[0] === data[0]);
+        if (isAlreadyAdded) {
+          return prevGame;
+        }
+        return { ...prevGame, players: [...prevGame.players, data] };
+      });
     });
 
     socket.on("player-left", (data) => {
@@ -51,7 +52,7 @@ function Game() {
       if (data.gameStarted) {
         setGame((prev) => ({ ...prev, gameStarted: true }));
       }
-      setDrawerChoosing(true);
+      setGame((prev) => ({ ...prev, drawerChoosing: true }));
     });
 
     socket.on("gameStarted", () => {
@@ -61,13 +62,13 @@ function Game() {
     socket.on("wordChosen", (data) => {
       setWordChosen(data.word);
       setWordToChoose([]);
+      setGame((prev) => ({ ...prev, drawerChoosing: false }));
     });
 
     socket.on("wordLength", (data) => {
-      setWordLength(data.wordLenght);
-      setDrawerChoosing(false);
+      setGame((prev) => ({ ...prev, wordLenght: data.wordLenght }));
+      setGame((prev) => ({ ...prev, drawerChoosing: false }));
     });
-
   }, []);
 
   const handleWordChoice = (word) => {
@@ -82,9 +83,9 @@ function Game() {
       {game.gameStarted ? (
         <div className="flex flex-col justify-center items-center w-full h-full relative">
           {/* Word Display Box */}
-          {wordChosen || wordLength ? (
+          {wordChosen || game.wordLenght ? (
             <div className="absolute top-4 bg-gray-900 bg-opacity-80 text-white px-6 py-2 rounded-lg text-2xl font-semibold">
-              {wordChosen ? wordChosen : "_ ".repeat(wordLength)}
+              {wordChosen ? wordChosen : "_ ".repeat(game.wordLenght)}
             </div>
           ) : null}
 
@@ -115,7 +116,7 @@ function Game() {
           )}
 
           {/* Waiting Overlay for Non-Drawer Players - Fullscreen Overlay */}
-          {drawerChoosing && (
+          {game.drawerChoosing && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md h-full w-full z-40">
               <p className="text-white text-2xl font-semibold">Waiting for the drawer to choose a word...</p>
             </div>

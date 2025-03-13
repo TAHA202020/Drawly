@@ -6,6 +6,9 @@ module.exports= class Room{
         this.owner=owner
         this.gameStarted=false
         this.drawer=null
+        this.wordtoDraw=null
+        this.wordChoosingTimer=null
+        this.roundTimer=null
     }
     setGameStarted(value)
     {
