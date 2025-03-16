@@ -7,6 +7,8 @@ module.exports= class Room{
         this.gameStarted=false
         this.drawer=null
         this.wordtoDraw=null
+        this.wordChoosingTime=10;
+        this.roundTime=200;
         this.wordChoosingTimer=null
         this.roundTimer=null
     }

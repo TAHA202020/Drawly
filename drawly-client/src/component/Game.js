@@ -6,6 +6,7 @@ import { UserContext } from "../context/UserContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { GameContext } from "../context/GameContext";
 import { socket } from "../utils/socket";
+import Chronometer from "./Chronometer";
 
 function Game() {
   const { game, setGame } = useContext(GameContext);
@@ -70,6 +71,9 @@ function Game() {
       setGame((prev) => ({ ...prev, drawerChoosing: false }));
     });
   }, []);
+  socket.on("word-timer", (data) => {
+    setGame((prev) => ({ ...prev, wordchoosingTime: data.time }));
+  });
 
   const handleWordChoice = (word) => {
     socket.emit("wordChosen", word);
@@ -96,11 +100,13 @@ function Game() {
           </div>
 
           {/* Word Selection UI for Drawer - Fullscreen Overlay */}
-          {wordToChoose.length > 0 && (
+          {wordToChoose.length > 0 && (<>
+            
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md h-full w-full z-50">
               <div className="bg-white bg-opacity-80 p-6 rounded-xl shadow-lg text-center">
                 <h2 className="text-lg font-bold mb-4">Pick a word to draw</h2>
                 <div className="flex gap-3">
+                <Chronometer time={game.wordchoosingTime} />
                   {wordToChoose.map((word, index) => (
                     <button
                       key={index}
@@ -112,12 +118,13 @@ function Game() {
                   ))}
                 </div>
               </div>
-            </div>
+            </div></>
           )}
 
           {/* Waiting Overlay for Non-Drawer Players - Fullscreen Overlay */}
           {game.drawerChoosing && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md h-full w-full z-40">
+              <Chronometer time={game.wordchoosingTime} />
               <p className="text-white text-2xl font-semibold">Waiting for the drawer to choose a word...</p>
             </div>
           )}
