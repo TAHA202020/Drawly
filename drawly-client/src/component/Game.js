@@ -47,6 +47,9 @@ function Game() {
         setGame((prev) => ({ ...prev, gameStarted: true }));
       }
       setWordToChoose(data.words);
+      setGame((prev) => ({ ...prev, wordchoosingTime: 10 }));
+      setGame((prev) => ({ ...prev, wordLenght:0 }));
+      setWordChosen(null);
     });
 
     socket.on("drawer-choosing", (data) => {
@@ -54,6 +57,9 @@ function Game() {
         setGame((prev) => ({ ...prev, gameStarted: true }));
       }
       setGame((prev) => ({ ...prev, drawerChoosing: true }));
+      setGame((prev) => ({ ...prev, wordchoosingTime: 10 }));
+      setGame((prev) => ({ ...prev, wordLenght:0 }));
+      setWordChosen(null);
     });
 
     socket.on("gameStarted", () => {

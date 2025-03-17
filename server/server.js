@@ -19,7 +19,7 @@ io.on("connection",(socket)=>
                 room.PlayerJoin(socket.id,data.username)
                 socket.room=room
                 socket.join(id)
-                socket.emit("room-joined",{room_id:id, owner:true , players:Array.from(room.players.entries()), drawer:room.drawer,user:data.username ,gameStarted:room.gameStarted, drawerChoosing:room.wordtoDraw===null,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null, wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime})
+                socket.emit("room-joined",{round_counter:0,number_of_rounds:room.NumberOfRounds,room_id:id, owner:true , players:Array.from(room.players.entries()), drawer:room.drawer,user:data.username ,gameStarted:room.gameStarted, drawerChoosing:room.wordtoDraw===null,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null, wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime})
             }
             else if(Rooms.get(data.room_id))
             {
@@ -28,7 +28,7 @@ io.on("connection",(socket)=>
                 socket.room=room
                 socket.to(data.room_id).emit("player-joined",[socket.id,data.username])
                 socket.join(data.room_id)
-                socket.emit("room-joined",{room_id:data.room_id, owner:false , players:Array.from(room.players.entries()), drawer:room.drawer,user:data.username,gameStarted:room.gameStarted, drawerChoosing:room.wordtoDraw===null,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null,wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime})
+                socket.emit("room-joined",{round_counter:0,number_of_rounds:room.NumberOfRounds,room_id:data.room_id, owner:false , players:Array.from(room.players.entries()), drawer:room.drawer,user:data.username,gameStarted:room.gameStarted, drawerChoosing:room.wordtoDraw===null,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null,wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime})
                 
             }
             else
@@ -46,6 +46,39 @@ io.on("connection",(socket)=>
             socket.broadcast.emit("draw-end",data)
         })
         socket.on("message",(data)=>{
+            if(socket.room.wordtoDraw)
+            {
+                if(data.message.toLowerCase()===socket.room.wordtoDraw.toLowerCase())
+                {
+                    socket.to(socket.room.id).emit("message",{name:"Server",message:`${data.name} guessed the word`})
+                    socket.room.guessedRight()
+                    if(socket.room.playerGuessed===socket.room.players.size-1)
+                    {
+                        if(socket.room.NextRound()){
+                            socket.room.randomDrawer()
+                            io.to(socket.room.drawer).emit("words-choosing", {words:socket.room.wordstoChoose,round_counter:socket.room.roundCounter});
+                            io.to(socket.room.id).except(socket.room.drawer).emit("drawer-choosing",{round_counter:socket.room.roundCounter});
+                            socket.room.wordChoosingTimer=setInterval(() => {
+                                if(socket.room.wordChoosingTime===0)
+                                {
+                                    clearInterval(socket.room.wordChoosingTimer)
+                                    socket.room.wordChoosingTime=10
+                                    socket.room.wordtoDraw=socket.room.wordstoChoose[0]
+                                    io.to(socket.drawer).emit("wordChosen", {word:socket.rooms.wordstoChoose[0]});
+                                    io.to(socket.room.id).except(socket.room.drawer).emit("wordLength", {wordLenght:socket.room.wordtoDraw.length});
+                                    socket.wordstoChoose=[]
+                                }
+                                socket.room.wordChoosingTime--;
+                                io.to(socket.room.id).emit("word-timer",{time:socket.room.wordChoosingTime});
+                                
+                                
+                            },1000)
+    
+                    }
+                    }
+                }
+            }
+
             socket.to(socket.room.id).emit("message",{name:data.name,message:data.message})
         })
         socket.on("fill", (data) => {
@@ -54,16 +87,17 @@ io.on("connection",(socket)=>
         socket.on("gameStarted", () => {
             socket.room.setGameStarted(true)
             socket.room.randomDrawer()
-            io.to(socket.room.drawer).emit("words-choosing", {words:["potato","car","lighter"],gameStarted:true});
+            io.to(socket.room.drawer).emit("words-choosing", {words:socket.room.wordstoChoose,gameStarted:true});
             io.to(socket.room.id).except(socket.room.drawer).emit("drawer-choosing",{gameStarted:true});
             socket.room.wordChoosingTimer=setInterval(() => {
                 if(socket.room.wordChoosingTime===0)
                 {
                     clearInterval(socket.room.wordChoosingTimer)
-                    socket.room.wordChoosingTime=60
-                    socket.room.wordtoDraw="apple"
-                    io.to(socket.room.id).emit("wordChosen", {word:"apple"});
+                    socket.room.wordChoosingTime=10
+                    socket.room.wordtoDraw=socket.room.wordstoChoose[0]
+                    io.to(socket.room.drawer).emit("wordChosen", {word:socket.room.wordstoChoose[0]});
                     io.to(socket.room.id).except(socket.room.drawer).emit("wordLength", {wordLenght:socket.room.wordtoDraw.length});
+                    socket.wordstoChoose=[]
                 }
                 socket.room.wordChoosingTime--;
                 io.to(socket.room.id).emit("word-timer",{time:socket.room.wordChoosingTime});
@@ -90,7 +124,6 @@ io.on("connection",(socket)=>
                 socket.room=null
             }
         })
-        //gameLogic
 
         
     })

@@ -4,8 +4,8 @@ import { socket } from "../utils/socket";
 const DrawingCanvas = () => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("#000000"); // Fill color
-  const [tool, setTool] = useState("draw"); // "draw" or "fill"
+  const [selectedColor, setSelectedColor] = useState("#000000");
+  const [tool, setTool] = useState("draw");
 
   useEffect(() => {
     const canvas = canvasRef.current;
