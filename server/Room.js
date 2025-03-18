@@ -11,7 +11,7 @@ module.exports= class Room{
         this.roundTime=200;
         this.wordChoosingTimer=null
         this.roundTimer=null
-        this.NumberOfRounds=5
+        this.NumberOfRounds=15
         this.roundCounter=1
         this.wordstoChoose=[]
         this.playerGuessed=0
@@ -39,6 +39,7 @@ module.exports= class Room{
         let keys=Array.from(this.players.keys())
         this.drawer=keys[Math.floor(Math.random()*keys.length)]
         this.wordstoChoose=["potato","car","lighter"]
+        this.wordtoDraw=null
     }
     setWordToDraw(word)
     {

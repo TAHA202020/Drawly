@@ -46,30 +46,31 @@ io.on("connection",(socket)=>
             socket.broadcast.emit("draw-end",data)
         })
         socket.on("message",(data)=>{
-            if(socket.room.wordtoDraw)
+            let room=socket.room
+            if(room.wordtoDraw)
             {
-                if(data.message.toLowerCase()===socket.room.wordtoDraw.toLowerCase())
+                if(data.message.toLowerCase()===room.wordtoDraw.toLowerCase())
                 {
-                    socket.to(socket.room.id).emit("message",{name:"Server",message:`${data.name} guessed the word`})
-                    socket.room.guessedRight()
-                    if(socket.room.playerGuessed===socket.room.players.size-1)
+                    io.to(room.id).emit("message",{name:"Server",message:`${data.name} guessed the word`})
+                    room.guessedRight()
+                    if(room.playerGuessed===room.players.size-1)
                     {
-                        if(socket.room.NextRound()){
-                            socket.room.randomDrawer()
-                            io.to(socket.room.drawer).emit("words-choosing", {words:socket.room.wordstoChoose,round_counter:socket.room.roundCounter});
-                            io.to(socket.room.id).except(socket.room.drawer).emit("drawer-choosing",{round_counter:socket.room.roundCounter});
-                            socket.room.wordChoosingTimer=setInterval(() => {
-                                if(socket.room.wordChoosingTime===0)
+                        if(room.NextRound()){
+                            room.randomDrawer()
+                            io.to(room.drawer).emit("words-choosing", {words:room.wordstoChoose,round_counter:room.roundCounter});
+                            io.to(room.id).except(room.drawer).emit("drawer-choosing",{round_counter:room.roundCounter});
+                            room.wordChoosingTimer=setInterval(() => {
+                                if(room.wordChoosingTime===0)
                                 {
-                                    clearInterval(socket.room.wordChoosingTimer)
-                                    socket.room.wordChoosingTime=10
-                                    socket.room.wordtoDraw=socket.room.wordstoChoose[0]
-                                    io.to(socket.drawer).emit("wordChosen", {word:socket.rooms.wordstoChoose[0]});
-                                    io.to(socket.room.id).except(socket.room.drawer).emit("wordLength", {wordLenght:socket.room.wordtoDraw.length});
-                                    socket.wordstoChoose=[]
+                                    clearInterval(room.wordChoosingTimer)
+                                    room.wordChoosingTime=10
+                                    room.wordtoDraw=room.wordstoChoose[0]
+                                    io.to(room.drawer).emit("wordChosen", {word:room.wordstoChoose[0]});
+                                    io.to(room.id).except(socket.room.drawer).emit("wordLength", {wordLenght:room.wordtoDraw.length});
+                                    room.wordstoChoose=[]
                                 }
-                                socket.room.wordChoosingTime--;
-                                io.to(socket.room.id).emit("word-timer",{time:socket.room.wordChoosingTime});
+                                room.wordChoosingTime--;
+                                io.to(room.id).emit("word-timer",{time:room.wordChoosingTime});
                                 
                                 
                             },1000)
@@ -106,8 +107,8 @@ io.on("connection",(socket)=>
             },1000)
         });
           socket.on("wordChosen", (word) => {
-            socket.room.wordChoosingTime=10
             clearInterval(socket.room.wordChoosingTimer)
+            socket.room.wordChoosingTime=10
             socket.room.wordtoDraw=word
             socket.emit("wordChosen", {word:word});
             io.to(socket.room.id).except(socket.id).emit("wordLength", {wordLenght:word.length});
@@ -120,8 +121,6 @@ io.on("connection",(socket)=>
                     io.to(newOwner).emit("ownership",{owner:true})
                 }
                 io.to(socket.room.id).emit("player-left",{playerId:socket.id})
-                
-                socket.room=null
             }
         })
 
