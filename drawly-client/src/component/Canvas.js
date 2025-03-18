@@ -194,7 +194,7 @@ const DrawingCanvas = ({roundTime}) => {
   };
   return (
     <div className="flex flex-col items-center relative">
-    <div>
+    <div className="absolute top-0 left-0 -translate-y-full ">
       <Chronometer time={roundTime}/>
     </div>
       <div className="flex gap-4 mb-2 palette flex-wrap justify-center">

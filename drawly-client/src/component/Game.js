@@ -47,8 +47,9 @@ function Game() {
         setGame((prev) => ({ ...prev, gameStarted: true }));
       }
       setWordToChoose(data.words);
-      setGame((prev) => ({ ...prev, wordLenght:0, roundTime:0 ,wordchoosingTime: 10  }));
       setWordChosen(null);
+      setGame((prev) => ({ ...prev, wordLenght:0, roundTime:0 ,wordchoosingTime: 10  ,drawerChoosing: false }));
+      
     });
 
     socket.on("drawer-choosing", (data) => {
@@ -67,12 +68,11 @@ function Game() {
     socket.on("wordChosen", (data) => {
       setWordChosen(data.word);
       setWordToChoose([]);
-      setGame((prev) => ({ ...prev, drawerChoosing: false }));
+      setGame((prev) => ({ ...prev, drawerChoosing: false ,roundTime:200 }));
     });
 
     socket.on("wordLength", (data) => {
-      setGame((prev) => ({ ...prev, wordLenght: data.wordLenght }));
-      setGame((prev) => ({ ...prev, drawerChoosing: false }));
+      setGame((prev) => ({ ...prev, wordLenght: data.wordLenght, drawerChoosing: false , roundTime:200 }));
     });
   }, []);
   socket.on("word-timer", (data) => {
@@ -92,13 +92,14 @@ function Game() {
       {game.gameStarted ? (
         <div className="flex flex-col justify-center items-center w-full h-full relative">
           {/* Word Display Box */}
-          {wordChosen || game.wordLenght ? (
-            <div className="absolute top-4 bg-gray-900 bg-opacity-80 text-white px-6 py-2 rounded-lg text-2xl font-semibold">
-              {wordChosen ? wordChosen : "_ ".repeat(game.wordLenght)}
-            </div>
-          ) : null}
+          
 
-          <div className="flex justify-center items-start gap-5 w-full">
+          <div className="flex relative justify-center items-start gap-5 w-full">
+            {wordChosen || game.wordLenght ? (
+              <div className="absolute -translate-y-full left-[50%] -translate-x-full bg-gray-900 bg-opacity-80 text-white px-6 py-2 rounded-lg text-2xl font-semibold">
+                {wordChosen ? wordChosen : "_ ".repeat(game.wordLenght)}
+              </div>
+            ) : null}
             <Players players={game.players} />
             <DrawingCanvas roundTime={game.roundTime}/>
             <Chat />

@@ -125,7 +125,7 @@ function generateId() {
 
 function startRound(io,room)
 {
-    room.roundTime=201
+    room.roundTime=200
     room.roundTimer=setInterval(() => {
         if(room.roundTime===0)
         {
@@ -146,6 +146,7 @@ function startRound(io,room)
 function endRound(io,room)
 {
     clearInterval(room.roundTimer)
+    room.roundTimer=null
     room.roundCounter++
     room.roundTime=0
     room.randomDrawer()

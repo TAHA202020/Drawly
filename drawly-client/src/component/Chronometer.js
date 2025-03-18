@@ -1,6 +1,6 @@
 export default function Chronometer({time}) 
 {
-    if(time===0)
+    if(time==0)
         {
             return null
         }
