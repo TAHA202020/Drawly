@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
+import Chronometer from "./Chronometer";
 import { socket } from "../utils/socket";
 
-const DrawingCanvas = () => {
+const DrawingCanvas = ({roundTime}) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [selectedColor, setSelectedColor] = useState("#000000");
@@ -193,6 +194,9 @@ const DrawingCanvas = () => {
   };
   return (
     <div className="flex flex-col items-center relative">
+    <div>
+      <Chronometer time={roundTime}/>
+    </div>
       <div className="flex gap-4 mb-2 palette flex-wrap justify-center">
       <button onClick={handleClearCanvas}>Clear Canvas</button>
         <button onClick={() => setTool("draw")} className={`px-3 py-1 border ${tool === "draw" ? "bg-gray-300" : ""}`}>

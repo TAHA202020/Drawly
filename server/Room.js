@@ -8,7 +8,7 @@ module.exports= class Room{
         this.drawer=null
         this.wordtoDraw=null
         this.wordChoosingTime=10;
-        this.roundTime=200;
+        this.roundTime=0;
         this.wordChoosingTimer=null
         this.roundTimer=null
         this.NumberOfRounds=15
@@ -40,6 +40,7 @@ module.exports= class Room{
         this.drawer=keys[Math.floor(Math.random()*keys.length)]
         this.wordstoChoose=["potato","car","lighter"]
         this.wordtoDraw=null
+        this.wordChoosingTime=11
     }
     setWordToDraw(word)
     {
@@ -48,17 +49,9 @@ module.exports= class Room{
     }
     NextRound()
     {
-        if(this.roundCounter===this.NumberOfRounds)
-        {
-            this.gameStarted=false
-            this.roundCounter=1
-            this.wordtoDraw=null
-            this.wordstoChoose=[]
-            return false;
-        }
         this.playerGuessed=0
         this.roundCounter++
-        return true;
+        return true
     }
     guessedRight()
     {

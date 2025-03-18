@@ -47,8 +47,7 @@ function Game() {
         setGame((prev) => ({ ...prev, gameStarted: true }));
       }
       setWordToChoose(data.words);
-      setGame((prev) => ({ ...prev, wordchoosingTime: 10 }));
-      setGame((prev) => ({ ...prev, wordLenght:0 }));
+      setGame((prev) => ({ ...prev, wordLenght:0, roundTime:0 ,wordchoosingTime: 10  }));
       setWordChosen(null);
     });
 
@@ -56,10 +55,9 @@ function Game() {
       if (data.gameStarted) {
         setGame((prev) => ({ ...prev, gameStarted: true }));
       }
-      setGame((prev) => ({ ...prev, drawerChoosing: true }));
-      setGame((prev) => ({ ...prev, wordchoosingTime: 10 }));
-      setGame((prev) => ({ ...prev, wordLenght:0 }));
       setWordChosen(null);
+      setGame((prev) => ({ ...prev, drawerChoosing: true, wordchoosingTime: 10, wordLenght:0 , roundTime:0   }));
+      
     });
 
     socket.on("gameStarted", () => {
@@ -80,7 +78,8 @@ function Game() {
   socket.on("word-timer", (data) => {
     setGame((prev) => ({ ...prev, wordchoosingTime: data.time }));
   });
-
+  socket.on("round-timer", (data) => {
+    setGame((prev) => ({ ...prev, roundTime: data.time }));});
   const handleWordChoice = (word) => {
     socket.emit("wordChosen", word);
   };
@@ -101,7 +100,7 @@ function Game() {
 
           <div className="flex justify-center items-start gap-5 w-full">
             <Players players={game.players} />
-            <DrawingCanvas />
+            <DrawingCanvas roundTime={game.roundTime}/>
             <Chat />
           </div>
 

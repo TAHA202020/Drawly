@@ -2,6 +2,7 @@ const app=require("express")()
 const http=require("http").Server(app)
 const {Server}=require("socket.io")
 const Room =require("./Room")
+const { clear } = require("console")
 
 const io=new Server(http,{
     cors :{origin:"*"}
@@ -56,25 +57,7 @@ io.on("connection",(socket)=>
                     if(room.playerGuessed===room.players.size-1)
                     {
                         if(room.NextRound()){
-                            room.randomDrawer()
-                            io.to(room.drawer).emit("words-choosing", {words:room.wordstoChoose,round_counter:room.roundCounter});
-                            io.to(room.id).except(room.drawer).emit("drawer-choosing",{round_counter:room.roundCounter});
-                            room.wordChoosingTimer=setInterval(() => {
-                                if(room.wordChoosingTime===0)
-                                {
-                                    clearInterval(room.wordChoosingTimer)
-                                    room.wordChoosingTime=10
-                                    room.wordtoDraw=room.wordstoChoose[0]
-                                    io.to(room.drawer).emit("wordChosen", {word:room.wordstoChoose[0]});
-                                    io.to(room.id).except(socket.room.drawer).emit("wordLength", {wordLenght:room.wordtoDraw.length});
-                                    room.wordstoChoose=[]
-                                }
-                                room.wordChoosingTime--;
-                                io.to(room.id).emit("word-timer",{time:room.wordChoosingTime});
-                                
-                                
-                            },1000)
-    
+                            endRound(io,room)
                     }
                     }
                 }
@@ -107,11 +90,14 @@ io.on("connection",(socket)=>
             },1000)
         });
           socket.on("wordChosen", (word) => {
-            clearInterval(socket.room.wordChoosingTimer)
-            socket.room.wordChoosingTime=10
-            socket.room.wordtoDraw=word
+            let room = socket.room;
+            console.log("interval cleared")
+            clearInterval(room.wordChoosingTimer)
+            room.wordChoosingTimer=null
+            room.wordtoDraw=word
             socket.emit("wordChosen", {word:word});
-            io.to(socket.room.id).except(socket.id).emit("wordLength", {wordLenght:word.length});
+            io.to(room.id).except(socket.id).emit("wordLength", {wordLenght:word.length});
+            startRound(io,room) 
           });
         socket.on("disconnect",()=>{
             if(socket.room!==null)
@@ -136,6 +122,54 @@ function generateId() {
     }
     return id;
     }
+
+function startRound(io,room)
+{
+    room.roundTime=201
+    room.roundTimer=setInterval(() => {
+        if(room.roundTime===0)
+        {
+            clearInterval(room.roundTimer)
+            if(room.NextRound()){
+                endRound(io,room)
+        }
+        }
+        room.roundTime--;
+        io.to(room.id).emit("round-timer",{time:room.roundTime});
+        
+
+    },1000)
+
+}
+
+
+function endRound(io,room)
+{
+    clearInterval(room.roundTimer)
+    room.roundCounter++
+    room.roundTime=0
+    room.randomDrawer()
+    io.to(room.drawer).emit("words-choosing", {words:room.wordstoChoose,round_counter:room.roundCounter});
+    io.to(room.id).except(room.drawer).emit("drawer-choosing",{round_counter:room.roundCounter});
+    room.wordChoosingTimer=setInterval(() => {
+        if(room.wordChoosingTime===0)
+        {
+            clearInterval(room.wordChoosingTimer)
+            room.wordChoosingTime=10
+            room.wordtoDraw=room.wordstoChoose[0]
+            io.to(room.drawer).emit("wordChosen", {word:room.wordstoChoose[0]});
+            io.to(room.id).except(room.drawer).emit("wordLength", {wordLenght:room.wordtoDraw.length});
+            room.wordstoChoose=[]
+            startRound(io,room)
+        }
+        
+        room.wordChoosingTime--;
+        io.to(room.id).emit("word-timer",{time:room.wordChoosingTime});
+        
+    },1000)
+}
+
+
 http.listen(4000,()=>
     {
         console.log("server listenening on port 4000")
