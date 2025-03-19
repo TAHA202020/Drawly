@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 *
 {
     margin: 0;
@@ -114,7 +115,7 @@
     padding: 10px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
     background-color: rgb(211, 211, 211);
   }
   .player-img

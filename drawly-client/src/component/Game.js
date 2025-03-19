@@ -7,6 +7,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { GameContext } from "../context/GameContext";
 import { socket } from "../utils/socket";
 import Chronometer from "./Chronometer";
+import DrawThis from "./DrawThis";
+import GuessThis from "./GuessThis";
 
 function Game() {
   const { game, setGame } = useContext(GameContext);
@@ -48,7 +50,7 @@ function Game() {
       }
       setWordToChoose(data.words);
       setWordChosen(null);
-      setGame((prev) => ({ ...prev, wordLenght:0, roundTime:0 ,wordchoosingTime: 10  ,drawerChoosing: false }));
+      setGame((prev) => ({ ...prev, wordLenght:0, roundTime:0 ,wordchoosingTime: 10  ,drawerChoosing: false ,drawer: data.drawer }));
       
     });
 
@@ -57,7 +59,7 @@ function Game() {
         setGame((prev) => ({ ...prev, gameStarted: true }));
       }
       setWordChosen(null);
-      setGame((prev) => ({ ...prev, drawerChoosing: true, wordchoosingTime: 10, wordLenght:0 , roundTime:0   }));
+      setGame((prev) => ({ ...prev, drawerChoosing: true, wordchoosingTime: 10, wordLenght:0 , roundTime:0 ,drawer: data.drawer }));
       
     });
 
@@ -90,18 +92,16 @@ function Game() {
     <div className="flex justify-center items-center h-screen relative">
       {/* Game UI */}
       {game.gameStarted ? (
-        <div className="flex flex-col justify-center items-center w-full h-full relative">
+        <div >
           {/* Word Display Box */}
-          
-
-          <div className="flex relative justify-center items-start gap-5 w-full">
+          <div className="flex relative justify-center items-start gap-5 w-full h-[500px]">
             {wordChosen || game.wordLenght ? (
-              <div className="absolute -translate-y-full left-[50%] -translate-x-full bg-gray-900 bg-opacity-80 text-white px-6 py-2 rounded-lg text-2xl font-semibold">
-                {wordChosen ? wordChosen : "_ ".repeat(game.wordLenght)}
+              <div className="absolute -translate-y-[120%] left-[50%] -translate-x-full">
+                {wordChosen ? <DrawThis word={wordChosen}  />:<GuessThis wordLenght={game.wordLenght} />}
               </div>
             ) : null}
             <Players players={game.players} />
-            <DrawingCanvas roundTime={game.roundTime}/>
+            <DrawingCanvas roundTime={game.roundTime} canDraw={game.drawer.id==game.user.id}/>
             <Chat />
           </div>
 
@@ -112,7 +112,6 @@ function Game() {
               <div className="bg-white bg-opacity-80 p-6 rounded-xl shadow-lg text-center">
                 <h2 className="text-lg font-bold mb-4">Pick a word to draw</h2>
                 <div className="flex gap-3">
-                <Chronometer time={game.wordchoosingTime} />
                   {wordToChoose.map((word, index) => (
                     <button
                       key={index}
@@ -130,8 +129,7 @@ function Game() {
           {/* Waiting Overlay for Non-Drawer Players - Fullscreen Overlay */}
           {game.drawerChoosing && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md h-full w-full z-40">
-              <Chronometer time={game.wordchoosingTime} />
-              <p className="text-white text-2xl font-semibold">Waiting for the drawer to choose a word...</p>
+              <p className="text-white text-2xl font-semibold">Waiting for {game.drawer.username} to choose a word...</p>
             </div>
           )}
         </div>

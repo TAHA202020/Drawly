@@ -16,7 +16,6 @@ export default function Lobby()
             socket.on("room-joined",(data)=>
                 {
                     setUser({id:socket.id,username:data.user})
-                    delete data.user
                     setGame(data)
                     console.log(data)
                     navigate(`/${data.room_id}`)

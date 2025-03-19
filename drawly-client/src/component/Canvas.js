@@ -1,13 +1,12 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import Chronometer from "./Chronometer";
 import { socket } from "../utils/socket";
 
-const DrawingCanvas = ({roundTime}) => {
+const DrawingCanvas = ({roundTime , canDraw}) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [selectedColor, setSelectedColor] = useState("#000000");
   const [tool, setTool] = useState("draw");
-
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
@@ -64,8 +63,9 @@ const DrawingCanvas = ({roundTime}) => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
   const handleMouseDown = (e) => {
+    if(!canDraw) return;
+
     if (tool === "fill") {
       const x = e.nativeEvent.offsetX;
       const y = e.nativeEvent.offsetY;
@@ -87,6 +87,7 @@ const DrawingCanvas = ({roundTime}) => {
   };
 
   const handleMouseMove = (e) => {
+    if(!canDraw) return;
     if (!isDrawing) return;
 
     const canvas = canvasRef.current;
@@ -97,6 +98,7 @@ const DrawingCanvas = ({roundTime}) => {
   };
 
   const handleMouseUp = (e) => {
+    if(!canDraw) return;
     if (!isDrawing) return;
 
     const context = e.target.getContext("2d");
@@ -186,6 +188,7 @@ const DrawingCanvas = ({roundTime}) => {
     return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255, 255];
   };
   const handleClearCanvas = () => {
+    if(!canDraw()) return;
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
   
@@ -197,7 +200,7 @@ const DrawingCanvas = ({roundTime}) => {
     <div className="absolute top-0 left-0 -translate-y-full ">
       <Chronometer time={roundTime}/>
     </div>
-      <div className="flex gap-4 mb-2 palette flex-wrap justify-center">
+      {canDraw && <div className="flex gap-4 mb-2 palette flex-wrap justify-center">
       <button onClick={handleClearCanvas}>Clear Canvas</button>
         <button onClick={() => setTool("draw")} className={`px-3 py-1 border ${tool === "draw" ? "bg-gray-300" : ""}`}>
           🖌️ Draw
@@ -220,7 +223,7 @@ const DrawingCanvas = ({roundTime}) => {
         <div className="bg-[#800080] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#800080")}></div>
         <div className="bg-[#FFC0CB] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#FFC0CB")}></div>
         <div className="bg-[#8B4513] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#8B4513")}></div>
-      </div>
+      </div>}
 
       <canvas
         ref={canvasRef}
