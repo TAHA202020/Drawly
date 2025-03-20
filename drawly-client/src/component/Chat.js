@@ -21,17 +21,16 @@ export default function Chat() {
     e.target.value = ""; // Clear input field
   };
 
-  // Scroll to bottom when new messages are added
   useEffect(() => {
     chatRef.current.scrollTop = chatRef.current.scrollHeight;
   }, [messages]);
 
   return (
     <div className="w-[15vw] flex flex-col h-full">
-      <div className=" p-2 border-b border-gray-600">Chat</div>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 max-h-full" ref={chatRef}>
+      <div className=" p-2 bg-gray-800">Chat</div>
+      <div className="flex-1 overflow-y-auto overflow-x-hidden max-h-full " ref={chatRef}>
         {messages.map((msg, index) => (
-          <div key={index} className="py-1">{msg.name} : {msg.message}</div>
+          <div key={index} className="flex items-center gap-2 message-bg p-1 w-full "><p className="font-bold">{msg.name} : </p><p className="text-sm">{msg.message}</p></div>
         ))}
       </div>
       <input

@@ -94,7 +94,7 @@ function Game() {
       {game.gameStarted ? (
         <div >
           {/* Word Display Box */}
-          <div className="flex relative justify-center items-start gap-5 w-full h-[500px]">
+          <div className="flex relative justify-center items-start gap-5 w-full h-[60vh]">
             {wordChosen || game.wordLenght ? (
               <div className="absolute -translate-y-[120%] left-[50%] -translate-x-full">
                 {wordChosen ? <DrawThis word={wordChosen}  />:<GuessThis wordLenght={game.wordLenght} />}

@@ -11,8 +11,8 @@ const DrawingCanvas = ({roundTime , canDraw}) => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
 
-    canvas.height = window.innerHeight / 2;
-    canvas.width = window.innerWidth / 2;
+    canvas.height = window.innerHeight * 0.6;
+    canvas.width = window.innerWidth * 0.6;
     context.lineCap = "round";
     
 
