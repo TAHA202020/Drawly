@@ -204,16 +204,16 @@ const DrawingCanvas = ({roundTime , canDraw}) => {
     <div className="flex flex-col items-center relative">
     
       {canDraw && <div className="palette">
-      <h1 className="text-2xl font-bold text-center">Tools</h1>
+      <h1 className="text-2xl font-bold text-center">Palette</h1>
       <div className="flex flex-row justify-center items-center gap-[50px] mt-2 mb-10">
           {/* Colors */}
-          <div className="flex flex-row items-start bg-white">
+          <div className="flex flex-row items-start">
           <img src={clear} alt="clear" onClick={()=>handleClearCanvas()} className="tool px-3 py-1 border"/>
           <img src={pen} alt="pen" onClick={() => setTool("draw")} className={`px-3 py-1 border ${tool === "draw" ? "bg-gray-300" : ""} cursor-pointer tool`} />
           <img src={fill} alt="fill" onClick={() => setTool("fill")} className={`px-3 py-1 border ${tool === "fill" ? "bg-gray-300" : ""} fill-bg cursor-pointer tool`} />
           </div>
           {/* Colors */}
-          <div className=" flex flex-row flex-wrap gap-2 bg-white">
+          <div className=" flex flex-row flex-wrap gap-2 ">
           <div className="bg-[#000000] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#000000")}></div>
           <div className="bg-[#808080] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#808080")}></div>
           <div className="bg-[#C0C0C0] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#C0C0C0")}></div>

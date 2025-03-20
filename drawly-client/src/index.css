@@ -147,7 +147,14 @@
 {
   opacity: 0.7;
 }
-
+.player:nth-child(even)
+{
+  background-color: rgb(211, 211, 211);
+}
+.player:nth-child(odd)
+{
+ background-color: rgb(238, 238, 238);
+}
 .message-bg:nth-child(even)
 {
  background-color: rgb(211, 211, 211);
@@ -173,7 +180,7 @@
 }
 .palette
 {
-  background-color: #f9f9f9;
+  background-color: #a9a6a6;
   position: absolute;
   bottom: 0;
   transform: translateY(110%);
