@@ -7,7 +7,7 @@ export default function Chronometer({time})
             return null
         }
     return (
-        <div className="flex justify-center items-center text-black relative">
+        <div className="flex justify-center items-center text-black relative bg-white">
             <img  src={clock} alt='clock'/>
             <p className='absolute font-bold'>{time}</p>
         </div>

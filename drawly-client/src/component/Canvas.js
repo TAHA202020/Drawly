@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect, useContext } from "react";
 import Chronometer from "./Chronometer";
 import { socket } from "../utils/socket";
-
+import fill from "../assets/fill.gif";
+import pen from "../assets/pen.gif";
+import clear from "../assets/clear.gif";
 const DrawingCanvas = ({roundTime , canDraw}) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -40,7 +42,10 @@ const DrawingCanvas = ({roundTime , canDraw}) => {
     socket.on("fill", (data) => {
       scanlineFloodFill(data.x, data.y, data.color);
     });
-    
+    socket.on("clear-canvas", () => {
+      handleClearCanvas();
+    });
+
     const handleResize = () => {
       const tempCanvas = document.createElement("canvas");
       tempCanvas.width = canvas.width;
@@ -51,8 +56,8 @@ const DrawingCanvas = ({roundTime , canDraw}) => {
       tempContext.drawImage(canvas, 0, 0);
   
       // Resize canvas
-      canvas.width = window.innerWidth / 2;
-      canvas.height = window.innerHeight / 2;
+      canvas.width = window.innerWidth *0.6;
+      canvas.height = window.innerHeight *0.6;
   
       // Restore the drawing
       context.drawImage(tempCanvas, 0, 0);
@@ -188,47 +193,51 @@ const DrawingCanvas = ({roundTime , canDraw}) => {
     return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255, 255];
   };
   const handleClearCanvas = () => {
-    if(!canDraw()) return;
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
   
     // Clear the canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
+    socket.emit("clear-canvas");
   };
   return (
     <div className="flex flex-col items-center relative">
-    <div className="absolute top-0 left-0 -translate-y-full ">
-      <Chronometer time={roundTime}/>
-    </div>
-      {canDraw && <div className="flex gap-4 mb-2 palette flex-wrap justify-center">
-      <button onClick={handleClearCanvas}>Clear Canvas</button>
-        <button onClick={() => setTool("draw")} className={`px-3 py-1 border ${tool === "draw" ? "bg-gray-300" : ""}`}>
-          🖌️ Draw
-        </button>
-        <button onClick={() => setTool("fill")} className={`px-3 py-1 border ${tool === "fill" ? "bg-gray-300" : ""}`}>
-          🪣 Fill
-        </button>
-        <div className="bg-[#000000] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#000000")}></div>
-        <div className="bg-[#808080] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#808080")}></div>
-        <div className="bg-[#C0C0C0] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#C0C0C0")}></div>
-        <div className="bg-[#FFFFFF] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#FFFFFF")}></div>
-        <div className="bg-[#FF0000] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#FF0000")}></div>
-        <div className="bg-[#FFA500] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#FFA500")}></div>
-        <div className="bg-[#FFFF00] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#FFFF00")}></div>
-        <div className="bg-[#008000] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#008000")}></div>
-        <div className="bg-[#00FF00] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#00FF00")}></div>
-        <div className="bg-[#00FFFF] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#00FFFF")}></div>
-        <div className="bg-[#0000FF] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#0000FF")}></div>
-        <div className="bg-[#00AAFF] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#00AAFF")}></div>
-        <div className="bg-[#800080] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#800080")}></div>
-        <div className="bg-[#FFC0CB] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#FFC0CB")}></div>
-        <div className="bg-[#8B4513] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#8B4513")}></div>
+    
+      {canDraw && <div className="palette">
+      <h1 className="text-2xl font-bold text-center">Tools</h1>
+      <div className="flex flex-row justify-center items-center gap-[50px] mt-2 mb-10">
+          {/* Colors */}
+          <div className="flex flex-row items-start bg-white">
+          <img src={clear} alt="clear" onClick={()=>handleClearCanvas()} className="tool px-3 py-1 border"/>
+          <img src={pen} alt="pen" onClick={() => setTool("draw")} className={`px-3 py-1 border ${tool === "draw" ? "bg-gray-300" : ""} cursor-pointer tool`} />
+          <img src={fill} alt="fill" onClick={() => setTool("fill")} className={`px-3 py-1 border ${tool === "fill" ? "bg-gray-300" : ""} fill-bg cursor-pointer tool`} />
+          </div>
+          {/* Colors */}
+          <div className=" flex flex-row flex-wrap gap-2 bg-white">
+          <div className="bg-[#000000] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#000000")}></div>
+          <div className="bg-[#808080] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#808080")}></div>
+          <div className="bg-[#C0C0C0] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#C0C0C0")}></div>
+          <div className="bg-[#FFFFFF] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#FFFFFF")}></div>
+          <div className="bg-[#FF0000] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#FF0000")}></div>
+          <div className="bg-[#FFA500] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#FFA500")}></div>
+          <div className="bg-[#FFFF00] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#FFFF00")}></div>
+          <div className="bg-[#008000] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#008000")}></div>
+          <div className="bg-[#00FF00] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#00FF00")}></div>
+          <div className="bg-[#00FFFF] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#00FFFF")}></div>
+          <div className="bg-[#0000FF] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#0000FF")}></div>
+          <div className="bg-[#00AAFF] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#00AAFF")}></div>
+          <div className="bg-[#800080] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#800080")}></div>
+          <div className="bg-[#FFC0CB] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#FFC0CB")}></div>
+          <div className="bg-[#8B4513] w-[50px] aspect-square palette-color" onClick={()=>setSelectedColor("#8B4513")}></div>
+          </div>
+          </div>
       </div>}
 
       <canvas
         ref={canvasRef}
         width={"50%"}
         height={500}
+        className="bg-white"
         style={{ border: "1px solid black", cursor: tool === "fill" ? "pointer" : "crosshair" }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}

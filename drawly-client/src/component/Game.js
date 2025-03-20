@@ -89,15 +89,18 @@ function Game() {
   if (!game) return <>Loading...</>;
 
   return (
-    <div className="flex justify-center items-center h-screen relative">
+    <div className="flex justify-center items-center h-screen relative bg-game">
       {/* Game UI */}
       {game.gameStarted ? (
         <div >
           {/* Word Display Box */}
           <div className="flex relative justify-center items-start gap-5 w-full h-[60vh]">
+          
             {wordChosen || game.wordLenght ? (
-              <div className="absolute -translate-y-[120%] left-[50%] -translate-x-full">
+              <div className="absolute -translate-y-[120%] w-full flex items-center justify-between bg-white">
+                <Chronometer time={game.roundTime}/>
                 {wordChosen ? <DrawThis word={wordChosen}  />:<GuessThis wordLenght={game.wordLenght} />}
+                <Chronometer time={game.roundTime}/>
               </div>
             ) : null}
             <Players players={game.players} />

@@ -52,6 +52,8 @@ io.on("connection",(socket)=>
             {
                 if(data.message.toLowerCase()===room.wordtoDraw.toLowerCase())
                 {
+                    if(socket.id==room.drawer)
+                        return
                     io.to(room.id).emit("message",{name:"Server",message:`${data.name} guessed the word`})
                     room.guessedRight()
                     if(room.playerGuessed===room.players.size-1)
@@ -69,6 +71,9 @@ io.on("connection",(socket)=>
         socket.on("fill", (data) => {
             socket.broadcast.emit("fill", data);
           });
+        socket.on("clear-canvas",()=>{
+            io.to(socket.room.id).except(socket.id).emit("clear-canvas")
+        })
         socket.on("gameStarted", () => {
             let room=socket.room
             room.setGameStarted(true)

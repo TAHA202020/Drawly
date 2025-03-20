@@ -135,16 +135,17 @@
     overflow: hidden;
   }
 
-  .palette
-  {
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    transform: translateY(150%);
-  }
 .palette-color
 {
-  border: 1px solid black;
+  cursor: pointer;
+  border: 1px solid rgb(224, 224, 224);
+  width:40px;
+  height: 40px;
+  border-radius: 5px;
+}
+.palette-color:hover
+{
+  opacity: 0.7;
 }
 
 .message-bg:nth-child(even)
@@ -154,4 +155,60 @@
 .message-bg:nth-child(odd)
 {
  background-color: rgb(238, 238, 238);
+}
+.tool:hover
+{
+  background-color: oklch(0.872 0.01 258.338);
+}
+.chat-container
+{
+  border: 1px solid rgb(233, 233, 233);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.guess-input
+{
+  border: 1px solid rgb(233, 233, 233);
+  font-size: small;
+}
+.palette
+{
+  background-color: #f9f9f9;
+  position: absolute;
+  bottom: 0;
+  transform: translateY(110%);
+  width: 100%;
+}
+
+.bg-game
+{
+  background-image: url("./assets/background.jpg");
+}
+
+
+.chat-scroll {
+  --sb-track-color: #333333;
+  --sb-thumb-color: #e6e6e6;
+  --sb-size: 7px;
+}
+
+.chat-scroll::-webkit-scrollbar {
+  width: var(--sb-size);
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 3px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 3px;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .chat-scroll {
+      scrollbar-color: var(--sb-thumb-color)
+                     var(--sb-track-color);
+  }
 }
