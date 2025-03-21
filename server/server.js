@@ -76,6 +76,11 @@ io.on("connection",(socket)=>
         })
         socket.on("gameStarted", () => {
             let room=socket.room
+            if(room.players.size<=1)
+            {
+                socket.emit("error",{message:"can't start the game with one player"})
+                return ;
+            }
             room.setGameStarted(true)
             room.randomDrawer()
             io.to(socket.room.drawer).emit("words-choosing", {words:socket.room.wordstoChoose,gameStarted:true ,drawer:{id:room.drawer,username:room.players.get(room.drawer)}});

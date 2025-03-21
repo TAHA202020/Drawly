@@ -4,7 +4,7 @@ import { socket } from "../utils/socket";
 import fill from "../assets/fill.gif";
 import pen from "../assets/pen.gif";
 import clear from "../assets/clear.gif";
-const DrawingCanvas = ({roundTime , canDraw}) => {
+const DrawingCanvas = ({ canDraw}) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [selectedColor, setSelectedColor] = useState("#000000");
@@ -188,7 +188,7 @@ const DrawingCanvas = ({roundTime , canDraw}) => {
     pixels[index + 3] = 255;
   };
 
-  const colorMatch = (color1, color2, tolerance = 20) => {
+  const colorMatch = (color1, color2, tolerance = 30) => {
     return (
       Math.abs(color1[0] - color2[0]) <= tolerance &&
       Math.abs(color1[1] - color2[1]) <= tolerance &&

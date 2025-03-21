@@ -9,6 +9,7 @@ import { socket } from "../utils/socket";
 import Chronometer from "./Chronometer";
 import DrawThis from "./DrawThis";
 import GuessThis from "./GuessThis";
+import ErrorMessage from "./ErrorMessage";
 
 function Game() {
   const { game, setGame } = useContext(GameContext);
@@ -17,12 +18,10 @@ function Game() {
   const navigate = useNavigate();
   const [wordToChoose, setWordToChoose] = useState([]);
   const [wordChosen, setWordChosen] = useState(null);
-
   useEffect(() => {
     if (user === null) {
       navigate("/?id=" + location.pathname.slice(1));
     }
-
     socket.on("player-joined", (data) => {
       setGame((prevGame) => {
         const isAlreadyAdded = prevGame.players.some(player => player[0] === data[0]);
@@ -88,8 +87,10 @@ function Game() {
 
   if (!game) return <>Loading...</>;
 
-  return (
+  return (<>
+  <ErrorMessage/>
     <div className="flex justify-center items-center h-screen relative bg-game">
+      
       {/* Game UI */}
       {game.gameStarted ? (
         <div >
@@ -149,7 +150,7 @@ function Game() {
       ) : (
         <div>Waiting for the owner to start the game...</div>
       )}
-    </div>
+    </div></>
   );
 }
 
