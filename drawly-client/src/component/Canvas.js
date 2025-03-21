@@ -12,10 +12,11 @@ const DrawingCanvas = ({roundTime , canDraw}) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
-
     canvas.height = window.innerHeight * 0.6;
     canvas.width = window.innerWidth * 0.6;
     context.lineCap = "round";
+    context.fillStyle = "#FFFFFF";
+    context.fillRect(0, 0, canvas.width, canvas.height);
     
 
     socket.on("draw-start", (data) => {
@@ -43,7 +44,13 @@ const DrawingCanvas = ({roundTime , canDraw}) => {
       scanlineFloodFill(data.x, data.y, data.color);
     });
     socket.on("clear-canvas", () => {
-      handleClearCanvas();
+      const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+  
+    // Clear the canvas
+    context.fillStyle = "#FFFFFF";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    
     });
 
     const handleResize = () => {
@@ -126,6 +133,7 @@ const DrawingCanvas = ({roundTime , canDraw}) => {
     const width = canvas.width;
 
     const startColor = getPixelColor(startX, startY, pixels, width);
+    console.log(startColor);
     const newColor = hexToRgbA(fillColor);
 
     if (colorMatch(startColor, newColor)) return;
@@ -195,9 +203,9 @@ const DrawingCanvas = ({roundTime , canDraw}) => {
   const handleClearCanvas = () => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
-  
-    // Clear the canvas
-    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    context.fillStyle = "#FFFFFF";
+    context.fillRect(0, 0, canvas.width, canvas.height);
     socket.emit("clear-canvas");
   };
   return (
@@ -234,6 +242,7 @@ const DrawingCanvas = ({roundTime , canDraw}) => {
       </div>}
 
       <canvas
+      
         ref={canvasRef}
         width={"50%"}
         height={500}
