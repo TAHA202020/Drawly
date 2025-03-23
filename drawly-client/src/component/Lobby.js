@@ -4,6 +4,7 @@ import logo from "../assets/logo.png"
 import {useNavigate, useSearchParams} from "react-router-dom"
 import { GameContext } from "../context/GameContext"
 import { UserContext } from "../context/UserContext"
+import ErrorMessage from "./ErrorMessage"
 
 export default function Lobby()
 {
@@ -26,15 +27,16 @@ export default function Lobby()
         socket.emit("create-room",{username:usernameRef.current.value,room_id:id.get("id")||null})
     }
     const usernameRef=useRef()
-    return (<div className="lobby-container">
+    return (<>
+    <ErrorMessage/>
+    <div className="lobby-container">
         <div className="lobby">
-            <img src={logo} alt="logo" className="logo"/>
-            {id.get("id")?<h1 className="title">Join room</h1>:<h1 className="title">Create room</h1>}
+            {id.get("id")?<h1 className="title">Join Room</h1>:<h1 className="title">Create Room</h1>}
             <div className="coolinput">
             <label htmlFor="input" className="text">Username:</label>
             <input type="text" placeholder="Write here..." name="input" ref={usernameRef} className="input" />
             </div>
-            <input type="submit" value="Play" className="submit-button" onClick={JoinRoom}/>
+            <input type="submit" value="Play" className="text-3xl text-bold submit-button sketch-text " onClick={JoinRoom}/>
         </div>
-    </div>)
+    </div></>)
 }

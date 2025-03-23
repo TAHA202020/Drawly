@@ -2,7 +2,6 @@ const app=require("express")()
 const http=require("http").Server(app)
 const {Server}=require("socket.io")
 const Room =require("./Room")
-const { clear } = require("console")
 
 const io=new Server(http,{
     cors :{origin:"*"}
@@ -12,6 +11,10 @@ io.on("connection",(socket)=>
     {
         socket.room=null
         socket.on("create-room",(data)=>{
+            if(data.username===""){
+                socket.emit("error",{message:"Please enter a Name a Zebi"})
+                return
+            }
             if(data.room_id===null)
             {
                 let id=generateId()
