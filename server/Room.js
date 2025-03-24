@@ -1,20 +1,21 @@
 module.exports= class Room{
     constructor(id,owner)
     {
-        this.players=new Map()
-        this.id=id
-        this.owner=owner
-        this.gameStarted=false
-        this.drawer=null
-        this.wordtoDraw=null
+        this.players=new Map();
+        this.maxPlayers=8;
+        this.id=id;
+        this.owner=owner;
+        this.gameStarted=false;
+        this.drawer=null;
+        this.wordtoDraw=null;
         this.wordChoosingTime=10;
         this.roundTime=0;
-        this.wordChoosingTimer=null
-        this.roundTimer=null
-        this.NumberOfRounds=15
-        this.roundCounter=1
-        this.wordstoChoose=[]
-        this.playerGuessed=0
+        this.wordChoosingTimer=null;
+        this.roundTimer=null;
+        this.NumberOfRounds=15;
+        this.roundCounter=1;
+        this.wordstoChoose=[];
+        this.playerGuessed=0;
     }
     setGameStarted(value)
     {
@@ -30,6 +31,7 @@ module.exports= class Room{
         if(this.owner===id)
         {
             this.owner=Array.from(this.players.keys())[0]
+            this.maxPlayers=8
             return this.owner
         }
         return null;

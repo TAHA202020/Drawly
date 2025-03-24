@@ -10,6 +10,7 @@ import Chronometer from "./Chronometer";
 import DrawThis from "./DrawThis";
 import GuessThis from "./GuessThis";
 import ErrorMessage from "./ErrorMessage";
+import GameOwnerSettings from "./GameOwnerSettings";
 
 function Game() {
   const { game, setGame } = useContext(GameContext);
@@ -137,16 +138,7 @@ function Game() {
             </div>
           )}
         </div>
-      ) : game.owner ? (
-        <div>
-          <p>You are the owner. Click to start the game.</p>
-          <button
-            onClick={() => socket.emit("gameStarted")}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Start Game
-          </button>
-        </div>
+      ) : game.owner ? (<GameOwnerSettings game={game}/>
       ) : (
         <div>Waiting for the owner to start the game...</div>
       )}

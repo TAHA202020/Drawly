@@ -28,6 +28,11 @@ io.on("connection",(socket)=>
             else if(Rooms.get(data.room_id))
             {
                 let room=Rooms.get(data.room_id)
+                if(room.maxPlayers==room.players.size)
+                    {
+                        socket.emit("error",{message:"The Game is Full "})
+                        return
+                    }
                 room.PlayerJoin(socket.id,data.username)
                 socket.room=room
                 socket.to(data.room_id).emit("player-joined",[socket.id,data.username])
@@ -40,6 +45,10 @@ io.on("connection",(socket)=>
                 socket.emit("room-not-found")
             
             }})
+        socket.on("max-players",({maxPlayers})=>
+            {
+                socket.room.maxPlayers=maxPlayers
+            })
         socket.on("draw",(data)=>{
         socket.broadcast.emit("draw",data)
         })
