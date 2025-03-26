@@ -21,6 +21,7 @@ export default function Lobby()
                     console.log(data)
                     navigate(`/${data.room_id}`)
                 })
+            return()=>{socket.off("room-joined")}
         },[])
     function JoinRoom()
     {

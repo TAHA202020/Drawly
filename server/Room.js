@@ -1,6 +1,9 @@
 module.exports= class Room{
     constructor(id,owner)
     {
+        this.PlayerPoints=new Map();
+        this.maxRoundTimer=90
+        this.maxWordPickingTimer=15
         this.players=new Map();
         this.maxPlayers=8;
         this.id=id;
@@ -23,7 +26,7 @@ module.exports= class Room{
     }
     PlayerJoin(id,username)
     {
-        this.players.set(id,username)
+        this.players.set(id,{username:username,points:0})
     }
     PlayerLeave(id)
     {
@@ -36,8 +39,17 @@ module.exports= class Room{
         }
         return null;
     }
+    getPlayersArray()
+    {
+        return [...this.players].map(([id, { username, points }]) => [id, username, points])
+    }
+    
+
+
+
     randomDrawer()
     {
+        this.PlayerPoints=new Map()
         let keys=Array.from(this.players.keys())
         this.drawer=keys[Math.floor(Math.random()*keys.length)]
         this.wordstoChoose=["potato","car","lighter"]
@@ -55,8 +67,20 @@ module.exports= class Room{
         this.roundCounter++
         return true
     }
-    guessedRight()
+    guessedRight(id)
     {
-        this.playerGuessed++
+        this.playerGuessed++;
+        let points=this.calculatePoints(this.playerGuessed,this.players.size,this.roundTime,this.maxRoundTimer)
+        this.PlayerPoints.set(id,{username:this.players.get(id).username,points:points})
+        let oldPlayerStats=this.players.get(id);
+        let oldPlayerPoints=oldPlayerStats.points
+        this.players.set(id,{...oldPlayerStats,points:oldPlayerPoints+points})
+        return points;
+    }
+    calculatePoints(position, totalPlayers, timeLeft, totalTime, basePoints = 100, bonusPoints = 50) {
+        let timeBonus = (timeLeft / totalTime) * bonusPoints;
+        let positionMultiplier = 1 - (position - 1) / totalPlayers;
+        let points = (basePoints + timeBonus) * positionMultiplier;
+        return Math.round(points);
     }
 }

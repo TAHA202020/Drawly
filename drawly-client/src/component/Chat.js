@@ -2,23 +2,16 @@ import { useState, useEffect, useRef, useContext } from "react";
 import { socket } from "../utils/socket";
 import { GameContext } from "../context/GameContext";
 import chat from "../assets/chat.gif";
-export default function Chat() {
-  const [messages, setMessages] = useState([]); // State to store chat messages
+export default function Chat({messages}) {
+   // State to store chat messages
   const chatRef = useRef();
   const {game}=useContext(GameContext)
-  useEffect(() => {
-    socket.on("message", (data) => {
-      setMessages((prevMessages) => [...prevMessages, data]);
-    });
-  }, []);
-
   const Sendchat = (e) => {
-    if (e.keyCode !== 13) return; // Send on Enter key
+    if (e.keyCode !== 13) return;
 
     const message = e.target.value;
-    socket.emit("message", {name:game.user.username,message: message }); // Emit message to the server
-    setMessages((prevMessages) => [...prevMessages, { name: "Me", message }]); // Update state with new message
-    e.target.value = ""; // Clear input field
+    socket.emit("message", {name:game.user.username,message: message });
+    e.target.value = "";
   };
 
   useEffect(() => {

@@ -6,6 +6,7 @@
 
 *
 {
+  font-family: "Reenie Beanie", cursive;
     margin: 0;
     padding: 0;
 }
@@ -280,9 +281,13 @@
 
 .settings
 {
+  font-size: xx-large;
+  font-weight:600;
   background-color: white;
-  padding: 10px;
+  padding: 50px;
+  width: 35vw;
   color: black;
+  border: 5px solid red;
 }
 .range-container
 {
@@ -290,4 +295,35 @@
   align-items: center;
   justify-content: start;
   gap: 0.75rem;
+}
+.signs
+{
+  width: 40px;
+  aspect-ratio: 1/1;
+  background-size: contain;
+  background-repeat: no-repeat;
+  border: 2px;
+}
+.plus
+{
+  background-image:url("./assets/plus.png") ;
+  
+}
+.minus
+{
+  background-image:url("./assets/minus.png") ;
+  background-position: center ;
+}
+.signs:hover
+{
+  background-color: rgb(230, 230, 230);
+}
+
+
+
+
+.crown
+{
+  transform: translate(-80%,-80%);
+  width: 40px;
 }

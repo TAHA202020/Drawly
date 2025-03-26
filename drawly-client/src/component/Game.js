@@ -17,75 +17,129 @@ function Game() {
   const { user } = useContext(UserContext);
   const location = useLocation();
   const navigate = useNavigate();
+  const [messages, setMessages] = useState([]);
   const [wordToChoose, setWordToChoose] = useState([]);
   const [wordChosen, setWordChosen] = useState(null);
+  
   useEffect(() => {
     if (user === null) {
       navigate("/?id=" + location.pathname.slice(1));
     }
-    socket.on("player-joined", (data) => {
+    socket.on("message", (data) => {
+      setMessages((prevMessages) => [...prevMessages, data]);
+    });
+    const handlePlayerJoined = (data) => {
       setGame((prevGame) => {
-        const isAlreadyAdded = prevGame.players.some(player => player[0] === data[0]);
-        if (isAlreadyAdded) {
-          return prevGame;
-        }
+        const isAlreadyAdded = prevGame.players.some(
+          (player) => player[0] === data[0]
+        );
+        if (isAlreadyAdded) return prevGame;
         return { ...prevGame, players: [...prevGame.players, data] };
       });
-    });
+    };
 
-    socket.on("player-left", (data) => {
+    const handlePlayerLeft = (data) => {
       setGame((prevGame) => ({
         ...prevGame,
         players: prevGame.players.filter((player) => player[0] !== data.playerId),
       }));
-    });
+    };
 
-    socket.on("ownership", (data) => {
+    const handleOwnership = (data) => {
       setGame((prev) => ({ ...prev, owner: data.owner }));
-    });
+    };
 
-    socket.on("words-choosing", (data) => {
+    const handleWordsChoosing = (data) => {
       if (data.gameStarted) {
         setGame((prev) => ({ ...prev, gameStarted: true }));
       }
       setWordToChoose(data.words);
       setWordChosen(null);
-      setGame((prev) => ({ ...prev, wordLenght:0, roundTime:0 ,wordchoosingTime: 10  ,drawerChoosing: false ,drawer: data.drawer }));
-      
-    });
+      setGame((prev) => ({
+        ...prev,
+        wordLenght: 0,
+        roundTime: 0,
+        wordchoosingTime: 10,
+        drawerChoosing: false,
+        drawer: data.drawer,
+      }));
+    };
 
-    socket.on("drawer-choosing", (data) => {
+    const handleDrawerChoosing = (data) => {
       if (data.gameStarted) {
         setGame((prev) => ({ ...prev, gameStarted: true }));
       }
       setWordChosen(null);
-      setGame((prev) => ({ ...prev, drawerChoosing: true, wordchoosingTime: 10, wordLenght:0 , roundTime:0 ,drawer: data.drawer }));
-      
-    });
+      setGame((prev) => ({
+        ...prev,
+        drawerChoosing: true,
+        wordchoosingTime: 10,
+        wordLenght: 0,
+        roundTime: 0,
+        drawer: data.drawer,
+      }));
+    };
 
-    socket.on("gameStarted", () => {
+    const handleGameStarted = () => {
       setGame((prev) => ({ ...prev, gameStarted: true }));
-    });
+    };
 
-    socket.on("wordChosen", (data) => {
+    const handleWordChosen = (data) => {
       setWordChosen(data.word);
       setWordToChoose([]);
-      setGame((prev) => ({ ...prev, drawerChoosing: false ,roundTime:200 }));
-    });
+      setGame((prev) => ({
+        ...prev,
+        drawerChoosing: false,
+        roundTime: data.roundmaxTimer,
+      }));
+    };
 
-    socket.on("wordLength", (data) => {
-      setGame((prev) => ({ ...prev, wordLenght: data.wordLenght, drawerChoosing: false , roundTime:200 }));
-    });
+    const handleWordLength = (data) => {
+      setGame((prev) => ({
+        ...prev,
+        wordLenght: data.wordLenght,
+        drawerChoosing: false,
+        roundTime: data.roundmaxTimer,
+      }));
+    };
+
+    const handleWordTimer = (data) => {
+      setGame((prev) => ({ ...prev, wordchoosingTime: data.time }));
+    };
+
+    const handleRoundTimer = (data) => {
+      setGame((prev) => ({ ...prev, roundTime: data.time }));
+    };
+
+    socket.on("player-joined", handlePlayerJoined);
+    socket.on("player-left", handlePlayerLeft);
+    socket.on("ownership", handleOwnership);
+    socket.on("words-choosing", handleWordsChoosing);
+    socket.on("drawer-choosing", handleDrawerChoosing);
+    socket.on("gameStarted", handleGameStarted);
+    socket.on("wordChosen", handleWordChosen);
+    socket.on("wordLength", handleWordLength);
+    socket.on("word-timer", handleWordTimer);
+    socket.on("round-timer", handleRoundTimer);
+
+    // Cleanup event listeners when component unmounts
+    return () => {
+      socket.off("player-joined", handlePlayerJoined);
+      socket.off("player-left", handlePlayerLeft);
+      socket.off("ownership", handleOwnership);
+      socket.off("words-choosing", handleWordsChoosing);
+      socket.off("drawer-choosing", handleDrawerChoosing);
+      socket.off("gameStarted", handleGameStarted);
+      socket.off("wordChosen", handleWordChosen);
+      socket.off("wordLength", handleWordLength);
+      socket.off("word-timer", handleWordTimer);
+      socket.off("round-timer", handleRoundTimer);
+    };
   }, []);
-  socket.on("word-timer", (data) => {
-    setGame((prev) => ({ ...prev, wordchoosingTime: data.time }));
-  });
-  socket.on("round-timer", (data) => {
-    setGame((prev) => ({ ...prev, roundTime: data.time }));});
+  
   const handleWordChoice = (word) => {
     socket.emit("wordChosen", word);
   };
-
   if (!game) return <>Loading...</>;
 
   return (<>
@@ -105,9 +159,9 @@ function Game() {
                 <Chronometer time={game.roundTime}/>
               </div>
             ) : null}
-            <Players players={game.players} />
+            <Players />
             <DrawingCanvas roundTime={game.roundTime} canDraw={game.drawer.id==game.user.id}/>
-            <Chat />
+            <Chat messages={messages}/>
           </div>
 
           {/* Word Selection UI for Drawer - Fullscreen Overlay */}
