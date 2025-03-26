@@ -281,7 +281,7 @@
 
 .settings
 {
-  font-size: xx-large;
+  font-size: x-large;
   font-weight:600;
   background-color: white;
   padding: 50px;
@@ -327,3 +327,37 @@
   transform: translate(-80%,-80%);
   width: 40px;
 }
+.green-msg
+{
+  color: rgb(80, 214, 80);
+}
+
+.waiting-players{
+  background-color: white;
+  padding: 50px;
+  font-size: x-large;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.loader {
+  width: 30px;
+  aspect-ratio: 1/1;
+  border: 5px solid black;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  }
+
+  @keyframes rotation {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(360deg);
+  }
+  } 

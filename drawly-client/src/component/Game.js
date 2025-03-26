@@ -25,9 +25,20 @@ function Game() {
     if (user === null) {
       navigate("/?id=" + location.pathname.slice(1));
     }
-    socket.on("message", (data) => {
+    
+    const handleMessage=(data) => {
+      let newdata={...data}
+      delete data.points
+      delete data.id
+      if(newdata.points)
+        {
+          setGame((prevGame)=>({...prevGame,players:prevGame.players.map(item =>{
+            return item[0] == newdata.id ? [item[0], item[1], item[2] + newdata.points] : item
+          })}))
+        }
+      
       setMessages((prevMessages) => [...prevMessages, data]);
-    });
+    }
     const handlePlayerJoined = (data) => {
       setGame((prevGame) => {
         const isAlreadyAdded = prevGame.players.some(
@@ -66,7 +77,7 @@ function Game() {
     };
     const handleGameEnd=()=>
     {
-      setGame(prevGame=>({...prevGame,gameStarted:false}))
+      setGame(prevGame=>({...prevGame,gameStarted:false,drawer:null ,wordLenght:null}))
       setWordToChoose([])
       setWordChosen(null)
       setMessages([])
@@ -116,6 +127,7 @@ function Game() {
     const handleRoundTimer = (data) => {
       setGame((prev) => ({ ...prev, roundTime: data.time }));
     };
+    socket.on("message", handleMessage);
     socket.on("end-game",handleGameEnd)
     socket.on("player-joined", handlePlayerJoined);
     socket.on("player-left", handlePlayerLeft);
@@ -130,6 +142,8 @@ function Game() {
 
     // Cleanup event listeners when component unmounts
     return () => {
+      socket.off("message",handleMessage)
+      socket.off("end-game",handleGameEnd)
       socket.off("player-joined", handlePlayerJoined);
       socket.off("player-left", handlePlayerLeft);
       socket.off("ownership", handleOwnership);
@@ -199,8 +213,10 @@ function Game() {
           )}
         </div>
       ) : game.owner ? (<GameOwnerSettings game={game}/>
-      ) : (
-        <div>Waiting for the owner to start the game...</div>
+      ) : (<div className="waiting-players">
+        <div >Waiting for the owner to start the game </div>
+        <span class="loader"></span>
+        </div>
       )}
     </div></>
   );

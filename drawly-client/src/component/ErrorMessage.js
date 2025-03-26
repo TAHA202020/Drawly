@@ -3,13 +3,13 @@ import { socket } from "../utils/socket";
 
 export default function ErrorMessage()
 {
-    const [errorMessage, setErrorMessage] = useState({ message: "", forceRender: 1 });
+    const [errorMessage, setErrorMessage] = useState({ message: "" });
     const messageRef = useRef(null);
     useEffect(() => {
         socket.on("error", ({ message }) => {
             setErrorMessage((prevState) => ({
+              ...prevState,
               message: message,
-              forceRender: prevState.forceRender + 1,
             }));
           });
         if (messageRef.current) {

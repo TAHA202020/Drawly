@@ -37,7 +37,6 @@ io.on("connection",(socket)=>
                 socket.room=room
                 socket.to(data.room_id).emit("player-joined",[socket.id,data.username,0])
                 socket.join(data.room_id)
-                console.log(room.getPlayersArray())
                 socket.emit("room-joined",{round_counter:0,number_of_rounds:room.NumberOfRounds,room_id:data.room_id, owner:false , players:room.getPlayersArray(), drawer:room.drawer&&{id:room.drawer,username:room.players.get(room.drawer).username.username},user:{id:socket.id,username:data.username} ,gameStarted:room.gameStarted, drawerChoosing:room.wordtoDraw===null,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null,wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime})
                 
             }
@@ -76,7 +75,7 @@ io.on("connection",(socket)=>
                     if(socket.id==room.drawer)
                         return
                     let points=room.guessedRight(socket.id)
-                    io.to(room.id).emit("message",{name:"Server",message:`${data.name} guessed the word`,points:points,id:socket.id})
+                    io.to(room.id).emit("message",{name:"Server",message:`${data.name} guessed the word`,points:points,id:socket.id,color:"green-msg"})
                     
                     if(room.playerGuessed===room.players.size-1)
                     {
@@ -141,12 +140,17 @@ io.on("connection",(socket)=>
                 if(newOwner!==null){
                     io.to(newOwner).emit("ownership",{owner:true})
                 }
+                if(room.players.size==0){
+                    Rooms.delete(room.id)
+                    return 
+                }
                 if(room.players.size<2)
                 {
                     room.resetRoom()
                     io.to(room.id).emit("end-game")
                     
                 }
+                
                 io.to(room.id).emit("player-left",{playerId:socket.id})
             }
         })
