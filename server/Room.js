@@ -83,4 +83,24 @@ module.exports= class Room{
         let points = (basePoints + timeBonus) * positionMultiplier;
         return Math.round(points);
     }
+    resetRoom()
+    {
+        clearInterval(this.wordChoosingTimer)
+        clearInterval(this.roundTimer)
+        this.PlayerPoints=new Map();
+        this.maxRoundTimer=90
+        this.maxWordPickingTimer=15
+        this.maxPlayers=8;
+        this.gameStarted=false;
+        this.drawer=null;
+        this.wordtoDraw=null;
+        this.wordChoosingTime=0;
+        this.roundTime=0;
+        this.wordChoosingTimer=null;
+        this.roundTimer=null;
+        this.NumberOfRounds=15;
+        this.roundCounter=1;
+        this.wordstoChoose=[];
+        this.playerGuessed=0;
+    }
 }

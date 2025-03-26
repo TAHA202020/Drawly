@@ -64,7 +64,13 @@ function Game() {
         drawer: data.drawer,
       }));
     };
-
+    const handleGameEnd=()=>
+    {
+      setGame(prevGame=>({...prevGame,gameStarted:false}))
+      setWordToChoose([])
+      setWordChosen(null)
+      setMessages([])
+    }
     const handleDrawerChoosing = (data) => {
       if (data.gameStarted) {
         setGame((prev) => ({ ...prev, gameStarted: true }));
@@ -110,7 +116,7 @@ function Game() {
     const handleRoundTimer = (data) => {
       setGame((prev) => ({ ...prev, roundTime: data.time }));
     };
-
+    socket.on("end-game",handleGameEnd)
     socket.on("player-joined", handlePlayerJoined);
     socket.on("player-left", handlePlayerLeft);
     socket.on("ownership", handleOwnership);

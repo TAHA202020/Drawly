@@ -134,13 +134,20 @@ io.on("connection",(socket)=>
             startRound(io,room) 
           });
         socket.on("disconnect",()=>{
-            if(socket.room!==null)
+            let room=socket.room
+            if(room!==null)
             {
-                let newOwner=socket.room.PlayerLeave(socket.id)
+                let newOwner=room.PlayerLeave(socket.id)
                 if(newOwner!==null){
                     io.to(newOwner).emit("ownership",{owner:true})
                 }
-                io.to(socket.room.id).emit("player-left",{playerId:socket.id})
+                if(room.players.size<2)
+                {
+                    room.resetRoom()
+                    io.to(room.id).emit("end-game")
+                    
+                }
+                io.to(room.id).emit("player-left",{playerId:socket.id})
             }
         })
 
