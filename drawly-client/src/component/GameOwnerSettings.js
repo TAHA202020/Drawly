@@ -7,7 +7,7 @@ export default function GameOwnerSettings({game})
 
     const [maxPlayers,setMaxPlayers]=useState(8)
     const [roundTimer,setRoundTimer] =useState(90)
-    const [wordpuckingtimer,Setwordpickingtimer]=useState(10)
+    const [wordpickingtimer,Setwordpickingtimer]=useState(10)
     return(<>
     <ErrorMessage/>
     <div className="settings relative">
@@ -62,18 +62,18 @@ export default function GameOwnerSettings({game})
                             <div className="range-container">
                                 <span className="signs minus" onClick={()=>
                                   {
-                                    if(wordpuckingtimer==5){
+                                    if(wordpickingtimer==5){
                                       return
                                     }
-                                    socket.emit("word-timer",{wordtimer:wordpuckingtimer-1})
+                                    socket.emit("word-timer",{wordtimer:wordpickingtimer-1})
                                     Setwordpickingtimer((prev)=>prev-1)
                                   }}></span>
-                                <p>{wordpuckingtimer}s</p>
+                                <p>{wordpickingtimer}s</p>
                                 <span className="signs plus" onClick={()=>
                                   {
-                                    if(wordpuckingtimer==15)
+                                    if(wordpickingtimer==15)
                                       return
-                                    socket.emit("word-timer",{roundTimer:wordpuckingtimer+1})
+                                    socket.emit("word-timer",{wordtimer:wordpickingtimer+1})
                                     Setwordpickingtimer((prev)=>prev+1)
                                   }}></span>
                             </div>

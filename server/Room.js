@@ -69,6 +69,8 @@ module.exports= class Room{
     }
     guessedRight(id)
     {
+        if(this.PlayerPoints.has(id))
+            return null;
         this.playerGuessed++;
         let points=this.calculatePoints(this.playerGuessed,this.players.size,this.roundTime,this.maxRoundTimer)
         this.PlayerPoints.set(id,{username:this.players.get(id).username,points:points})
@@ -102,5 +104,15 @@ module.exports= class Room{
         this.roundCounter=1;
         this.wordstoChoose=[];
         this.playerGuessed=0;
+    }
+    getRoundPoints()
+    {
+        this.players.forEach((_, key) => {
+            if (!this.PlayerPoints.has(key)) {
+              this.PlayerPoints.set(key, {username: this.players.get(key).username, points: 0});
+            }
+          });
+
+        return [...this.PlayerPoints].map(([id, { username, points }]) => [id, username, points])
     }
 }

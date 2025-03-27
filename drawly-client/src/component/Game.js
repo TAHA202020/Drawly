@@ -70,7 +70,7 @@ function Game() {
         ...prev,
         wordLenght: 0,
         roundTime: 0,
-        wordchoosingTime: 10,
+        wordchoosingTime: data.maxWordPickingTimer,
         drawerChoosing: false,
         drawer: data.drawer,
       }));
@@ -90,7 +90,7 @@ function Game() {
       setGame((prev) => ({
         ...prev,
         drawerChoosing: true,
-        wordchoosingTime: 10,
+        wordchoosingTime: data.maxWordPickingTimer,
         wordLenght: 0,
         roundTime: 0,
         drawer: data.drawer,
@@ -121,12 +121,20 @@ function Game() {
     };
 
     const handleWordTimer = (data) => {
+      console.log(data.time)
       setGame((prev) => ({ ...prev, wordchoosingTime: data.time }));
     };
 
     const handleRoundTimer = (data) => {
       setGame((prev) => ({ ...prev, roundTime: data.time }));
     };
+    const handleRoundPoints=(data)=>
+    {
+      console.log(data)
+      setGame((prevGame)=>({...prevGame,wordLenght:null}))
+      setWordChosen(null)
+    }
+    socket.on("players-points",handleRoundPoints)
     socket.on("message", handleMessage);
     socket.on("end-game",handleGameEnd)
     socket.on("player-joined", handlePlayerJoined);
@@ -142,6 +150,7 @@ function Game() {
 
     // Cleanup event listeners when component unmounts
     return () => {
+      socket.off("players-points",handleRoundPoints)
       socket.off("message",handleMessage)
       socket.off("end-game",handleGameEnd)
       socket.off("player-joined", handlePlayerJoined);

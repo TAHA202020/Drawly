@@ -54,9 +54,9 @@ io.on("connection",(socket)=>
                 socket.room.maxRoundTimer=roundTimer
             })
         socket.on("word-timer",({wordtimer})=>
-                {
-                    socket.room.maxWordPickingTimer=wordtimer
-                })
+            {
+                socket.room.maxWordPickingTimer=wordtimer
+            })
         socket.on("draw",(data)=>{
         socket.broadcast.emit("draw",data)
         })
@@ -66,7 +66,7 @@ io.on("connection",(socket)=>
         socket.on("draw-end",(data)=>{
             socket.broadcast.emit("draw-end",data)
         })
-        socket.on("message",(data)=>{
+        socket.on("message",async (data)=>{
             let room=socket.room
             if(room.wordtoDraw)
             {
@@ -75,10 +75,14 @@ io.on("connection",(socket)=>
                     if(socket.id==room.drawer)
                         return
                     let points=room.guessedRight(socket.id)
+                    if(points===null)
+                        return
                     io.to(room.id).emit("message",{name:"Server",message:`${data.name} guessed the word`,points:points,id:socket.id,color:"green-msg"})
                     
                     if(room.playerGuessed===room.players.size-1)
-                    {
+                    { 
+                        io.to(room.id).emit("players-points",room.getRoundPoints())
+                        await delay(5000)
                         if(room.NextRound()){
                             endRound(io,room)
                     }
@@ -104,8 +108,8 @@ io.on("connection",(socket)=>
             }
             room.setGameStarted(true)
             room.randomDrawer()
-            io.to(socket.room.drawer).emit("words-choosing", {words:socket.room.wordstoChoose,gameStarted:true ,drawer:{id:room.drawer,username:room.players.get(room.drawer).username.username}});
-            io.to(socket.room.id).except(socket.room.drawer).emit("drawer-choosing",{gameStarted:true,drawer:{id:room.drawer,username:room.players.get(room.drawer).username.username}});
+            io.to(socket.room.drawer).emit("words-choosing", {words:socket.room.wordstoChoose,gameStarted:true ,drawer:{id:room.drawer,username:room.players.get(room.drawer).username.username},maxWordPickingTimer:room.maxWordPickingTimer});
+            io.to(socket.room.id).except(socket.room.drawer).emit("drawer-choosing",{gameStarted:true,drawer:{id:room.drawer,username:room.players.get(room.drawer).username.username},maxWordPickingTimer:room.maxWordPickingTimer});
             room.wordChoosingTimer=setInterval(() => {
                 if(room.wordChoosingTime===0)
                 {
@@ -137,12 +141,12 @@ io.on("connection",(socket)=>
             if(room!==null)
             {
                 let newOwner=room.PlayerLeave(socket.id)
-                if(newOwner!==null){
-                    io.to(newOwner).emit("ownership",{owner:true})
-                }
                 if(room.players.size==0){
                     Rooms.delete(room.id)
                     return 
+                }
+                if(newOwner!==null){
+                    io.to(newOwner).emit("ownership",{owner:true})
                 }
                 if(room.players.size<2)
                 {
@@ -150,7 +154,6 @@ io.on("connection",(socket)=>
                     io.to(room.id).emit("end-game")
                     
                 }
-                
                 io.to(room.id).emit("player-left",{playerId:socket.id})
             }
         })
@@ -167,14 +170,18 @@ function generateId() {
     }
     return id;
     }
-
+function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    };
 function startRound(io,room)
 {
     room.roundTime=room.maxRoundTimer
-    room.roundTimer=setInterval(() => {
+    room.roundTimer=setInterval(async () => {
         if(room.roundTime===0)
         {
             clearInterval(room.roundTimer)
+            io.to(room.id).emit("players-points",room.getRoundPoints())
+            await delay(5000)
             if(room.NextRound()){
                 endRound(io,room)
         }
@@ -194,9 +201,10 @@ function endRound(io,room)
     room.roundTimer=null;
     room.roundCounter++;
     room.roundTime=0;
+    room.PlayerPoints=new Map()
     room.randomDrawer()
-    io.to(room.drawer).emit("words-choosing", {words:room.wordstoChoose,round_counter:room.roundCounter,drawer:{id:room.drawer,username:room.players.get(room.drawer).username}});
-    io.to(room.id).except(room.drawer).emit("drawer-choosing",{round_counter:room.roundCounter,drawer:{id:room.drawer,username:room.players.get(room.drawer).username}});
+    io.to(room.drawer).emit("words-choosing", {words:room.wordstoChoose,round_counter:room.roundCounter,drawer:{id:room.drawer,username:room.players.get(room.drawer).username},maxWordPickingTimer:room.maxWordPickingTimer});
+    io.to(room.id).except(room.drawer).emit("drawer-choosing",{round_counter:room.roundCounter,drawer:{id:room.drawer,username:room.players.get(room.drawer).username},maxWordPickingTimer:room.maxWordPickingTimer});
     room.wordChoosingTimer=setInterval(() => {
         if(room.wordChoosingTime===0)
         {
