@@ -134,6 +134,17 @@ function Game() {
       setGame((prevGame)=>({...prevGame,wordLenght:null}))
       setWordChosen(null)
     }
+    const handleNewRound = (data) => 
+      {
+        if(data.gameStarted) {
+          setGame((prev) => ({ ...prev, gameStarted: true, roundCounter: data.roundCounter }));
+        }
+        else
+        {
+          setGame((prev => ({ ...prev, roundCounter: data.roundCounter })));
+        }
+      }
+    socket.on("new-round",handleNewRound)
     socket.on("players-points",handleRoundPoints)
     socket.on("message", handleMessage);
     socket.on("end-game",handleGameEnd)
@@ -150,6 +161,7 @@ function Game() {
 
     // Cleanup event listeners when component unmounts
     return () => {
+      socket.off("new-round",handleNewRound)
       socket.off("players-points",handleRoundPoints)
       socket.off("message",handleMessage)
       socket.off("end-game",handleGameEnd)
@@ -173,11 +185,14 @@ function Game() {
 
   return (<>
   <ErrorMessage/>
+  
     <div className="flex justify-center items-center h-screen relative bg-game">
       
       {/* Game UI */}
       {game.gameStarted ? (
-        <div >
+        
+        <div>
+          <div className="absolute z-10 top-0 bg-[#ffffff] flex justify-center"><div>{game.number_of_rounds}</div></div>
           {/* Word Display Box */}
           <div className="flex relative justify-center items-start gap-5 w-full h-[60vh]">
           
@@ -189,7 +204,7 @@ function Game() {
               </div>
             ) : null}
             <Players />
-            <DrawingCanvas roundTime={game.roundTime} canDraw={game.drawer.id==game.user.id}/>
+            <DrawingCanvas roundTime={game.roundTime} canDraw={game.drawer?game.drawer.id==game.user.id:false}/>
             <Chat messages={messages}/>
           </div>
 

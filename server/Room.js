@@ -1,6 +1,10 @@
+const Queue =require("./Queue")
+
 module.exports= class Room{
     constructor(id,owner)
     {
+        this.drawerChoosing=false;
+        this.turnsQueue=null;
         this.PlayerPoints=new Map();
         this.maxRoundTimer=90
         this.maxWordPickingTimer=15
@@ -11,12 +15,12 @@ module.exports= class Room{
         this.gameStarted=false;
         this.drawer=null;
         this.wordtoDraw=null;
-        this.wordChoosingTime=10;
+        this.wordChoosingTime=0;
         this.roundTime=0;
         this.wordChoosingTimer=null;
         this.roundTimer=null;
-        this.NumberOfRounds=15;
-        this.roundCounter=1;
+        this.NumberOfRounds=3;
+        this.roundCounter=0;
         this.wordstoChoose=[];
         this.playerGuessed=0;
     }
@@ -47,14 +51,14 @@ module.exports= class Room{
 
 
 
-    randomDrawer()
+    nextDrawer()
     {
+        this.playerGuessed=0
         this.PlayerPoints=new Map()
-        let keys=Array.from(this.players.keys())
-        this.drawer=keys[Math.floor(Math.random()*keys.length)]
+        this.drawer=this.Queue.dequeue()
         this.wordstoChoose=["potato","car","lighter"]
         this.wordtoDraw=null
-        this.wordChoosingTime=11
+        this.drawerChoosing=true
     }
     setWordToDraw(word)
     {
@@ -63,8 +67,10 @@ module.exports= class Room{
     }
     NextRound()
     {
-        this.playerGuessed=0
-        this.roundCounter++
+        if(this.roundCounter>=this.NumberOfRounds)
+        {
+            return false
+        }
         return true
     }
     guessedRight(id)
@@ -114,5 +120,18 @@ module.exports= class Room{
           });
 
         return [...this.PlayerPoints].map(([id, { username, points }]) => [id, username, points])
+    }
+    startRound()
+    {
+        this.Queue=new Queue(this.players)
+        this.roundCounter++
+    }
+    nextTurn()
+    {
+        if(this.Queue.isEmpty())
+        {
+            return false
+        }
+        return true
     }
 }
