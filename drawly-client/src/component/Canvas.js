@@ -1,10 +1,9 @@
-import React, { useRef, useState, useEffect, useContext } from "react";
-import Chronometer from "./Chronometer";
+import React, { useRef, useState, useEffect, forwardRef , useImperativeHandle } from "react";
 import { socket } from "../utils/socket";
 import fill from "../assets/fill.gif";
 import pen from "../assets/pen.gif";
 import clear from "../assets/clear.gif";
-const DrawingCanvas = ({ canDraw}) => {
+const DrawingCanvas = forwardRef(({ canDraw},ref) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [selectedColor, setSelectedColor] = useState("#000000");
@@ -45,11 +44,11 @@ const DrawingCanvas = ({ canDraw}) => {
     });
     socket.on("clear-canvas", () => {
       const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
-  
+      if(!canvas) return;
+      const context = canvas.getContext("2d");
     // Clear the canvas
-    context.fillStyle = "#FFFFFF";
-    context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "#FFFFFF";
+      context.fillRect(0, 0, canvas.width, canvas.height);
     
     });
 
@@ -202,12 +201,16 @@ const DrawingCanvas = ({ canDraw}) => {
   };
   const handleClearCanvas = () => {
     const canvas = canvasRef.current;
+    if(!canvas) return;
     const context = canvas.getContext("2d");
 
     context.fillStyle = "#FFFFFF";
     context.fillRect(0, 0, canvas.width, canvas.height);
     socket.emit("clear-canvas");
   };
+  useImperativeHandle(ref, () => ({
+    clearCanvas: handleClearCanvas,
+  }))
   return (
     <div className="flex flex-col items-center relative">
     
@@ -255,6 +258,6 @@ const DrawingCanvas = ({ canDraw}) => {
       ></canvas>
     </div>
   );
-};
+});
 
 export default DrawingCanvas;

@@ -1,7 +1,7 @@
 import DrawingCanvas from "./Canvas";
 import Players from "./Players";
 import Chat from "./Chat";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { GameContext } from "../context/GameContext";
@@ -11,8 +11,11 @@ import DrawThis from "./DrawThis";
 import GuessThis from "./GuessThis";
 import ErrorMessage from "./ErrorMessage";
 import GameOwnerSettings from "./GameOwnerSettings";
+import Round from "./Round";
+import PlayerPoints from "./PlayerPoints";
 
 function Game() {
+  const clearCanvasRef=useRef(null)
   const { game, setGame } = useContext(GameContext);
   const { user } = useContext(UserContext);
   const location = useLocation();
@@ -61,6 +64,7 @@ function Game() {
     };
 
     const handleWordsChoosing = (data) => {
+      clearCanvasRef.current.clearCanvas()
       if (data.gameStarted) {
         setGame((prev) => ({ ...prev, gameStarted: true }));
       }
@@ -68,6 +72,8 @@ function Game() {
       setWordChosen(null);
       setGame((prev) => ({
         ...prev,
+        showingRoundCounter: false,
+        showingPlayerPoints:false,
         wordLenght: 0,
         roundTime: 0,
         wordchoosingTime: data.maxWordPickingTimer,
@@ -77,18 +83,24 @@ function Game() {
     };
     const handleGameEnd=()=>
     {
-      setGame(prevGame=>({...prevGame,gameStarted:false,drawer:null ,wordLenght:null}))
+      let newplayers=[...game.players]
+      //reset players points
+      for(let i=0;i<newplayers.length;i++)
+      {
+        newplayers[i][2]=0
+      }
+      setGame(prevGame=>({...prevGame,gameStarted:false,drawer:null ,wordLenght:null, players:newplayers,showingRoundCounter:false,showingPlayerPoints:false}))
       setWordToChoose([])
       setWordChosen(null)
       setMessages([])
     }
     const handleDrawerChoosing = (data) => {
-      if (data.gameStarted) {
-        setGame((prev) => ({ ...prev, gameStarted: true }));
-      }
+      clearCanvasRef.current.clearCanvas()
       setWordChosen(null);
       setGame((prev) => ({
         ...prev,
+        showingRoundCounter: false,
+        showingPlayerPoints:false,
         drawerChoosing: true,
         wordchoosingTime: data.maxWordPickingTimer,
         wordLenght: 0,
@@ -130,18 +142,17 @@ function Game() {
     };
     const handleRoundPoints=(data)=>
     {
-      console.log(data)
-      setGame((prevGame)=>({...prevGame,wordLenght:null}))
+      setGame((prevGame)=>({...prevGame,wordLenght:null,playerPoints:data,drawer:null ,showingPlayerPoints:true,showingRoundCounter:false}))
       setWordChosen(null)
     }
     const handleNewRound = (data) => 
       {
         if(data.gameStarted) {
-          setGame((prev) => ({ ...prev, gameStarted: true, roundCounter: data.roundCounter }));
+          setGame((prev) => ({ ...prev, gameStarted: true, roundCounter: data.roundCounter,showingRoundCounter:true,showingPlayerPoints:false ,playerPoints:[] }));
         }
         else
         {
-          setGame((prev => ({ ...prev, roundCounter: data.roundCounter })));
+          setGame((prev => ({ ...prev, roundCounter: data.roundCounter,showingRoundCounter:true ,showingPlayerPoints:false ,playerPoints:[]})));
         }
       }
     socket.on("new-round",handleNewRound)
@@ -192,7 +203,9 @@ function Game() {
       {game.gameStarted ? (
         
         <div>
-          <div className="absolute z-10 top-0 bg-[#ffffff] flex justify-center"><div>{game.number_of_rounds}</div></div>
+          {/* Round Counter */}
+          {game.showingRoundCounter? (<Round round={game.roundCounter} roundMax={game.number_of_rounds}/>) : null}
+          {game.showingPlayerPoints? (<PlayerPoints playerPoints={game.playerPoints} />) : null}
           {/* Word Display Box */}
           <div className="flex relative justify-center items-start gap-5 w-full h-[60vh]">
           
@@ -204,7 +217,7 @@ function Game() {
               </div>
             ) : null}
             <Players />
-            <DrawingCanvas roundTime={game.roundTime} canDraw={game.drawer?game.drawer.id==game.user.id:false}/>
+            <DrawingCanvas roundTime={game.roundTime} canDraw={game.drawer?game.drawer.id==game.user.id:false} ref={clearCanvasRef}/>
             <Chat messages={messages}/>
           </div>
 

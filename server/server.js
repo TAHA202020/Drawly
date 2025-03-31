@@ -24,7 +24,7 @@ io.on("connection",(socket)=>
                 room.PlayerJoin(socket.id,data.username)
                 socket.room=room
                 socket.join(id)
-                socket.emit("room-joined",{roundCounter:room.roundCounter,number_of_rounds:room.NumberOfRounds,room_id:id, owner:true , players:room.getPlayersArray(), drawer:room.drawer&&{id:room.drawer,username:room.players.get(room.drawer).username.username},user:{id:socket.id,username:data.username} ,gameStarted:room.gameStarted, drawerChoosing:room.drawerChoosing,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null, wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime})
+                socket.emit("room-joined",{roundCounter:room.roundCounter,number_of_rounds:room.NumberOfRounds,room_id:id, owner:true , players:room.getPlayersArray(), drawer:room.drawer&&{id:room.drawer,username:room.players.get(room.drawer).username.username},user:{id:socket.id,username:data.username} ,gameStarted:room.gameStarted, drawerChoosing:room.drawerChoosing,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null, wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime,showingPlayerPoints:false,showingRoundCounter:false, playerPoints:null})
             }
             else if(Rooms.get(data.room_id))
             {
@@ -38,7 +38,7 @@ io.on("connection",(socket)=>
                 socket.room=room
                 socket.to(data.room_id).emit("player-joined",[socket.id,data.username,0])
                 socket.join(data.room_id)
-                socket.emit("room-joined",{roundCounter:room.roundCounter,number_of_rounds:room.NumberOfRounds,room_id:data.room_id, owner:false , players:room.getPlayersArray(), drawer:room.drawer&&{id:room.drawer,username:room.players.get(room.drawer).username.username},user:{id:socket.id,username:data.username} ,gameStarted:room.gameStarted, drawerChoosing:room.drawerChoosing,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null,wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime})
+                socket.emit("room-joined",{roundCounter:room.roundCounter,number_of_rounds:room.NumberOfRounds,room_id:data.room_id, owner:false , players:room.getPlayersArray(), drawer:room.drawer&&{id:room.drawer,username:room.players.get(room.drawer).username.username},user:{id:socket.id,username:data.username} ,gameStarted:room.gameStarted, drawerChoosing:room.drawerChoosing,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null,wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime,showingPlayerPoints:room.showingPlayerPoints,showingRoundCounter:room.showingRoundCounter, playerPoints:room.showingPlayerPoints?room.getRoundPoints():null})
                 
             }
             else
@@ -97,8 +97,13 @@ io.on("connection",(socket)=>
                     
                     if(room.playerGuessed===room.players.size-1)
                     { 
+                        room.wordtoDraw=null
+                        room.showingPlayerPoints=true
                         io.to(room.id).emit("players-points",room.getRoundPoints())
-                        await delay(5000)
+                        let isnotcanceled=await delay(5000,room.abortController.signal)
+                        if(!isnotcanceled)
+                            return
+                        room.showingPlayerPoints=false
                         if(room.nextTurn()){
                             startNewTurn(io,room)
                         }
@@ -106,13 +111,17 @@ io.on("connection",(socket)=>
                         {
                             room.startRound()
                             io.to(room.id).emit("new-round",{roundCounter:room.roundCounter})
-                            await delay(5000)
+                            let isnotcanceled=await delay(5000,room.abortController.signal)
+                            if(!isnotcanceled)
+                                return
+                            this.showingRoundCounter=false
                             startNewTurn(io,room)
                         }
                         else
                         {
-                            io.to(room.id).emit("end-game")
                             room.resetRoom()
+                            io.to(room.id).emit("end-game")
+                            
                         }
                     }
                     return
@@ -135,7 +144,10 @@ io.on("connection",(socket)=>
             room.setGameStarted(true)
             room.startRound()
             io.to(room.id).emit("new-round",{roundCounter:room.roundCounter ,gameStarted:true})
-            await delay(5000)
+            let isnotcanceled=await delay(5000,room.abortController.signal)
+            if(!isnotcanceled)
+            return
+            room.showingRoundCounter=false
             room.nextDrawer()
             io.to(socket.room.drawer).emit("words-choosing", {words:socket.room.wordstoChoose,gameStarted:true ,drawer:{id:room.drawer,username:room.players.get(room.drawer).username.username},maxWordPickingTimer:room.maxWordPickingTimer});
             io.to(socket.room.id).except(socket.room.drawer).emit("drawer-choosing",{gameStarted:true,drawer:{id:room.drawer,username:room.players.get(room.drawer).username.username},maxWordPickingTimer:room.maxWordPickingTimer});
@@ -202,9 +214,18 @@ function generateId() {
     }
     return id;
     }
-function delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    };
+    function delay(ms, signal) {
+        return new Promise((resolve) => {
+            const timeout = setTimeout(() => resolve(true), ms);
+    
+            if (signal) {
+                signal.addEventListener("abort", () => {
+                    clearTimeout(timeout);
+                    resolve(false);
+                });
+            }
+        });
+    }
 function startTurnTimer(io,room)
 {
     room.roundTime=room.maxRoundTimer
@@ -212,8 +233,13 @@ function startTurnTimer(io,room)
         if(room.roundTime===0)
         {
             clearInterval(room.roundTimer)
+            room.wordtoDraw=null
+            room.showingPlayerPoints=true
             io.to(room.id).emit("players-points",room.getRoundPoints())
-            await delay(5000)
+            let isnotcanceled=await delay(5000,room.abortController.signal)
+            if(!isnotcanceled)
+            return
+            room.showingPlayerPoints=false
             if(room.nextTurn()){
                 startNewTurn(io,room)
             }
@@ -221,7 +247,10 @@ function startTurnTimer(io,room)
             {
                 room.startRound()
                 io.to(room.id).emit("new-round",{roundCounter:room.roundCounter})
-                await delay(5000)
+                let isnotcanceled=await delay(5000,room.abortController.signal)
+                if(!isnotcanceled)
+                    return
+                room.showingRoundCounter=false
                 startNewTurn(io,room)
             }
             else
@@ -249,6 +278,7 @@ function startNewTurn(io,room)
     room.nextDrawer()
     io.to(room.drawer).emit("words-choosing", {words:room.wordstoChoose,round_counter:room.roundCounter,drawer:{id:room.drawer,username:room.players.get(room.drawer).username},maxWordPickingTimer:room.maxWordPickingTimer});
     io.to(room.id).except(room.drawer).emit("drawer-choosing",{round_counter:room.roundCounter,drawer:{id:room.drawer,username:room.players.get(room.drawer).username},maxWordPickingTimer:room.maxWordPickingTimer});
+    room.wordChoosingTime=room.maxWordPickingTimer
     room.wordChoosingTimer=setInterval(() => {
         if(room.wordChoosingTime===0)
         {

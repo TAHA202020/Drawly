@@ -3,6 +3,9 @@ const Queue =require("./Queue")
 module.exports= class Room{
     constructor(id,owner)
     {
+        this.abortController = new AbortController();
+        this.showingRoundCounter=false;
+        this.showingPlayerPoints=false;
         this.drawerChoosing=false;
         this.turnsQueue=null;
         this.PlayerPoints=new Map();
@@ -95,6 +98,11 @@ module.exports= class Room{
     {
         clearInterval(this.wordChoosingTimer)
         clearInterval(this.roundTimer)
+        if (this.abortController) {
+            this.abortController.abort();
+        }
+        this.abortController = new AbortController();
+        this.resetPlayersPoints()
         this.PlayerPoints=new Map();
         this.maxRoundTimer=90
         this.maxWordPickingTimer=15
@@ -106,10 +114,21 @@ module.exports= class Room{
         this.roundTime=0;
         this.wordChoosingTimer=null;
         this.roundTimer=null;
-        this.NumberOfRounds=15;
-        this.roundCounter=1;
+        this.NumberOfRounds=3;
+        this.roundCounter=0;
         this.wordstoChoose=[];
         this.playerGuessed=0;
+        this.showingRoundCounter=false;
+        this.showingPlayerPoints=false;
+        
+    }
+    resetPlayersPoints()
+    {
+        this.players.forEach((_, key) => {
+            if (!this.PlayerPoints.has(key)) {
+              this.PlayerPoints.set(key, {username: this.players.get(key).username, points: 0});
+            }
+          });
     }
     getRoundPoints()
     {
@@ -123,6 +142,7 @@ module.exports= class Room{
     }
     startRound()
     {
+        this.showingRoundCounter=true
         this.Queue=new Queue(this.players)
         this.roundCounter++
     }
