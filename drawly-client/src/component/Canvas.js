@@ -132,7 +132,6 @@ const DrawingCanvas = forwardRef(({ canDraw},ref) => {
     const width = canvas.width;
 
     const startColor = getPixelColor(startX, startY, pixels, width);
-    console.log(startColor);
     const newColor = hexToRgbA(fillColor);
 
     if (colorMatch(startColor, newColor)) return;

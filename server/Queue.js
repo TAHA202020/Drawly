@@ -11,5 +11,10 @@ module.exports=class Queue {
     isEmpty() {
         return this.items.length === 0;
     }
+    remove(item) {
+        const index = this.items.indexOf(item);
+        if (index !== -1) 
+            this.items.splice(index, 1);
+    }
 
 }

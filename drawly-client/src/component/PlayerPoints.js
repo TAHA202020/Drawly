@@ -1,6 +1,5 @@
 export default function PlayerPoints({ playerPoints }) 
 {
-    console.log(playerPoints)
     return (
         <div className="player-points">
             

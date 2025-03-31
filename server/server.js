@@ -64,18 +64,31 @@ io.on("connection",(socket)=>
             })
         /*Canvas Events*/
         socket.on("draw",(data)=>{
-        socket.broadcast.emit("draw",data)
+            let room =socket.room
+            socket.to(room.id).emit("draw",data)
         })
         socket.on("draw-start",(data)=>{
-            socket.broadcast.emit("draw-start",data)
+            let room =socket.room
+            if(socket.id!==room.drawer)
+                return
+            socket.to(room.id).emit("draw-start",data)
         })
         socket.on("draw-end",(data)=>{
-            socket.broadcast.emit("draw-end",data)
+            let room =socket.room
+            if(socket.id!==room.drawer)
+                return
+            socket.to(room.id).emit("draw-end",data)
         })
         socket.on("fill", (data) => {
-            socket.broadcast.emit("fill", data);
+            let room =socket.room
+            if(socket.id!==room.drawer)
+                return
+            socket.to(room.id).emit("fill", data);
           });
         socket.on("clear-canvas",()=>{
+            let room=socket.room
+            if(socket.id!==room.drawer)
+                return
             io.to(socket.room.id).except(socket.id).emit("clear-canvas")
         })
 
@@ -178,11 +191,12 @@ io.on("connection",(socket)=>
             io.to(room.id).except(socket.id).emit("wordLength", {wordLenght:word.length,roundmaxTimer:room.maxRoundTimer});
             startTurnTimer(io,room) 
           });
-        socket.on("disconnect",()=>{
+        socket.on("disconnect",async ()=>{
             let room=socket.room
             if(room!==null)
             {
                 let newOwner=room.PlayerLeave(socket.id)
+                io.to(room.id).emit("player-left",{playerId:socket.id})
                 if(room.players.size==0){
                     clearInterval(room.roundTimer)
                     clearInterval(room.wordChoosingTimer)
@@ -198,7 +212,44 @@ io.on("connection",(socket)=>
                     io.to(room.id).emit("end-game")
                     
                 }
-                io.to(room.id).emit("player-left",{playerId:socket.id})
+                if(room.drawer===socket.id)
+                {
+                    clearInterval(room.wordChoosingTimer)
+                    clearInterval(room.roundTimer)
+                    room.wordtoDraw=null
+                    room.drawerChoosing=true
+                    room.wordChoosingTime=0
+                    room.wordChoosingTimer=null
+                    room.roundTime=0
+                    room.roundTimer=null;
+                    room.abortController.abort()
+                    room.abortController=new AbortController()
+                    room.showingPlayerPoints=true
+                    io.to(room.id).emit("players-points",room.emptyPlayerPoints())
+                    await delay(5000,room.abortController.signal)
+                    let isnotcanceled=await delay(5000,room.abortController.signal)
+                    if(!isnotcanceled)
+                        return
+                    room.showingPlayerPoints=false
+                    if(room.nextTurn()){
+                        startNewTurn(io,room)
+                    }
+                    else if(room.NextRound())
+                    {
+                        room.startRound()
+                        io.to(room.id).emit("new-round",{roundCounter:room.roundCounter})
+                        let isnotcanceled=await delay(5000,room.abortController.signal)
+                        if(!isnotcanceled)
+                            return
+                        room.showingRoundCounter=false
+                        startNewTurn(io,room)
+                    }
+                    else
+                    {
+                        io.to(room.id).emit("end-game")
+                        room.resetRoom()
+                    }
+                }
             }
         })
 

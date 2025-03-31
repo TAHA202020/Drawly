@@ -133,7 +133,6 @@ function Game() {
     };
 
     const handleWordTimer = (data) => {
-      console.log(data.time)
       setGame((prev) => ({ ...prev, wordchoosingTime: data.time }));
     };
 

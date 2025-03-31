@@ -1,5 +1,5 @@
 const Queue =require("./Queue")
-
+const words = require('./words');
 module.exports= class Room{
     constructor(id,owner)
     {
@@ -35,9 +35,26 @@ module.exports= class Room{
     {
         this.players.set(id,{username:username,points:0})
     }
+    
+
+    getRandomWords(numWords = 3) {
+    const keys = Object.keys(words); 
+    const randomWords = [];
+
+    for (let i = 0; i < numWords; i++) {
+        const randomIndex = Math.floor(Math.random() * keys.length);
+        const randomWord = keys[randomIndex];
+        randomWords.push(randomWord);
+        keys.splice(randomIndex, 1);
+    }
+
+    return randomWords;
+    }
     PlayerLeave(id)
     {
         this.players.delete(id)
+        if(this.Queue)
+            this.Queue.remove(id)
         if(this.owner===id)
         {
             this.owner=Array.from(this.players.keys())[0]
@@ -50,8 +67,10 @@ module.exports= class Room{
     {
         return [...this.players].map(([id, { username, points }]) => [id, username, points])
     }
-    
-
+    emptyPlayerPoints()
+    {
+        return [...this.players].map(([id, { username }]) => [id, username, 0])
+    }
 
 
     nextDrawer()
@@ -59,7 +78,7 @@ module.exports= class Room{
         this.playerGuessed=0
         this.PlayerPoints=new Map()
         this.drawer=this.Queue.dequeue()
-        this.wordstoChoose=["potato","car","lighter"]
+        this.wordstoChoose=this.getRandomWords()
         this.wordtoDraw=null
         this.drawerChoosing=true
     }
