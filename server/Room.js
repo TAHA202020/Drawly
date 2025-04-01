@@ -22,7 +22,7 @@ module.exports= class Room{
         this.roundTime=0;
         this.wordChoosingTimer=null;
         this.roundTimer=null;
-        this.NumberOfRounds=3;
+        this.NumberOfRounds=1;
         this.roundCounter=0;
         this.wordstoChoose=[];
         this.playerGuessed=0;
@@ -140,9 +140,6 @@ module.exports= class Room{
         this.roundCounter=0;
         this.wordstoChoose=[];
         this.playerGuessed=0;
-        this.showingRoundCounter=false;
-        this.showingPlayerPoints=false;
-        
     }
     resetPlayersPoints()
     {

@@ -79,7 +79,7 @@ function Game() {
     const handleGameEnd=()=>
     {
       setGame(prevGame=>({...prevGame,gameStarted:false,drawer:null ,wordLenght:null,showingRoundCounter:false,showingPlayerPoints:false
-        , players:game.players.map(player=>
+        , players:prevGame.players.map(player=>
           {
             return [player[0],player[1],0]
           })
