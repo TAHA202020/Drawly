@@ -236,7 +236,7 @@ function Game() {
           {/* Waiting Overlay for Non-Drawer Players - Fullscreen Overlay */}
           {game.drawerChoosing && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md h-full w-full z-40">
-              <p className="text-white text-2xl font-semibold">Waiting for {game.drawer?.username} to choose a word...</p>
+              <p className="text-white text-2xl font-semibold">Waiting for {game.drawer.username} to choose a word...</p>
             </div>
           )}
         </div>
