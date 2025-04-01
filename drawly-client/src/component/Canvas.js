@@ -249,7 +249,7 @@ const DrawingCanvas = forwardRef(({ canDraw},ref) => {
         ref={canvasRef}
         width={"50%"}
         height={500}
-        className="bg-white"
+        className="bg-white canvas"
         style={{ border: "1px solid black", cursor: tool === "fill" ? "pointer" : "crosshair" }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
