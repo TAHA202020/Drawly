@@ -6,6 +6,7 @@ import { useContext } from "react"
 import { GameContext } from "../context/GameContext"
 export default function GameOwnerSettings()
 {
+    document.title = 'Drawly - Room Settings';
     const {game,setGame}=useContext(GameContext)
     const [maxPlayers,setMaxPlayers]=useState(8)
     const [roundTimer,setRoundTimer] =useState(90)

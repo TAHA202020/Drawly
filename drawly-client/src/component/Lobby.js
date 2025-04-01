@@ -14,6 +14,7 @@ export default function Lobby()
     const navigate=useNavigate()
     useEffect(()=>
         {
+            document.title = 'Drawly - Lobby';
             socket.on("room-joined",(data)=>
                 {
                     setUser({id:socket.id,username:data.user})

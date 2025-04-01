@@ -4,6 +4,7 @@ import fill from "../assets/fill.gif";
 import pen from "../assets/pen.gif";
 import clear from "../assets/clear.gif";
 const DrawingCanvas = forwardRef(({ canDraw},ref) => {
+  document.title = 'Drawly - Canvas';
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [selectedColor, setSelectedColor] = useState("#000000");
