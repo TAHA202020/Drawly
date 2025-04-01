@@ -13,8 +13,17 @@ import ErrorMessage from "./ErrorMessage";
 import GameOwnerSettings from "./GameOwnerSettings";
 import Round from "./Round";
 import PlayerPoints from "./PlayerPoints";
-
+import join from "../assets/join.wav"
+import left from "../assets/leave.wav"
+import showpointsAudio from "../assets/show-points.wav"
+import guessedRight from "../assets/guess.wav"
+import turnStart from "../assets/start-drawing.wav"
 function Game() {
+  const playerjoinedAudio=new Audio(join)
+  const showPointsAudio=new Audio(showpointsAudio)
+  const playerleftAudio=new Audio(left)
+  const guessedRightAudio =new Audio(guessedRight)
+  const turnStartAudio=new Audio(turnStart)
   const clearCanvasRef=useRef(null)
   const { game, setGame } = useContext(GameContext);
   const { user } = useContext(UserContext);
@@ -37,6 +46,7 @@ function Game() {
           setGame((prevGame)=>({...prevGame,players:prevGame.players.map(item =>{
             return item[0] == newdata.id ? [item[0], item[1], item[2] + newdata.points] : item
           })}))
+          guessedRightAudio.play()
         }
       
       setMessages((prevMessages) => [...prevMessages, data]);
@@ -45,11 +55,15 @@ function Game() {
       setGame((prevGame) => {
         return { ...prevGame, players: data };
       });
+      playerjoinedAudio.play()
     };
 
     const handlePlayerLeft = (data) => {
       setGame((prevGame) => {
         return {...prevGame,players: data.players}});
+      if(game.gameStarted)
+        setMessages((prevMessages) => [...prevMessages, {name:"Server",message:`${data.playerLeft} has left the game`,color:"yellow"}]);
+      playerleftAudio.play()
     };
 
     const handleOwnership = (data) => {
@@ -113,6 +127,7 @@ function Game() {
         drawerChoosing: false,
         roundTime: data.roundmaxTimer,
       }));
+      turnStartAudio.play()
     };
 
     const handleWordLength = (data) => {
@@ -122,6 +137,7 @@ function Game() {
         drawerChoosing: false,
         roundTime: data.roundmaxTimer,
       }));
+      turnStartAudio.play()
     };
 
     const handleWordTimer = (data) => {
@@ -135,6 +151,7 @@ function Game() {
     {
       setGame((prevGame)=>({...prevGame,wordLenght:null,playerPoints:data,drawer:null ,showingPlayerPoints:true,showingRoundCounter:false, drawerChoosing:false}))
       setWordChosen(null)
+      showPointsAudio.play()
     }
     const handleNewRound = (data) => 
       {

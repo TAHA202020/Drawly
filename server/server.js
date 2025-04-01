@@ -213,8 +213,9 @@ io.on("connection",(socket)=>
             let room=socket.room
             if(room!==null)
             {
+                let playerleft=room.players.get(socket.id)
                 let newOwner=room.PlayerLeave(socket.id)
-                io.to(room.id).emit("player-left",{players:room.getPlayersArray()})
+                io.to(room.id).emit("player-left",{players:room.getPlayersArray(),playerLeft:playerleft})
                 
                 if(room.players.size==0){
                     clearInterval(room.roundTimer)

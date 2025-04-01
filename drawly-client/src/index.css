@@ -446,3 +446,8 @@
 {
   image-rendering: pixelated;
 }
+
+.yellow
+{
+  color: rgb(226, 226, 93);
+}
