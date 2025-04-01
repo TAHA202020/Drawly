@@ -2,7 +2,7 @@ const app=require("express")()
 const http=require("http").Server(app)
 const {Server}=require("socket.io")
 const Room =require("./Room")
-
+const port =process.env.PORT || 4000
 const io=new Server(http,{
     cors :{origin:"*"}
 })
@@ -351,7 +351,7 @@ function startNewTurn(io,room)
 }
 
 
-http.listen(4000,()=>
+http.listen(port,()=>
     {
         console.log("server listenening on port 4000")
     })
