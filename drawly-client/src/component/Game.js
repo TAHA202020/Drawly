@@ -149,7 +149,17 @@ function Game() {
     };
     const handleRoundPoints=(data)=>
     {
-      setGame((prevGame)=>({...prevGame,wordLenght:null,playerPoints:data,drawer:null ,showingPlayerPoints:true,showingRoundCounter:false, drawerChoosing:false}))
+      setGame((prevGame)=>({
+        ...prevGame,wordLenght:null,
+        playerPoints:data.points,
+        drawer:null ,
+        showingPlayerPoints:true
+        ,showingRoundCounter:false
+        , drawerChoosing:false
+        ,players:data.drawerPoints!==null?prevGame.players.map(item =>{
+          return item[0] == prevGame.drawer.id ? [item[0], item[1], item[2] + data.drawerPoints] : item
+        }):prevGame.players
+      }))
       setWordChosen(null)
       showPointsAudio.play()
     }

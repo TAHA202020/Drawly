@@ -2,7 +2,7 @@ const app=require("express")()
 const http=require("http").Server(app)
 const {Server}=require("socket.io")
 const Room =require("./Room")
-const { player } = require("./words")
+const { player, drawer } = require("./words")
 const port =process.env.PORT || 4000
 const io=new Server(http,{
     cors :{origin:"*"}
@@ -128,7 +128,7 @@ io.on("connection",(socket)=>
                     { 
                         room.wordtoDraw=null
                         room.showingPlayerPoints=true
-                        io.to(room.id).emit("players-points",room.getRoundPoints())
+                        io.to(room.id).emit("players-points",{points:room.getRoundPoints(),drawerPoints:room.PlayerPoints.get(room.drawer).points})
                         let isnotcanceled=await delay(5000,room.abortController.signal)
                         room.showingPlayerPoints=false
                         if(!isnotcanceled)
@@ -246,7 +246,7 @@ io.on("connection",(socket)=>
                     room.abortController.abort()
                     room.abortController=new AbortController()
                     room.showingPlayerPoints=true
-                    io.to(room.id).emit("players-points",room.emptyPlayerPoints())
+                    io.to(room.id).emit("players-points",{points:room.emptyPlayerPoints()})
                     await delay(5000,room.abortController.signal)
                     let isnotcanceled=await delay(5000,room.abortController.signal)
                     room.showingPlayerPoints=false
@@ -310,7 +310,7 @@ function startTurnTimer(io,room)
             clearInterval(room.roundTimer)
             room.wordtoDraw=null
             room.showingPlayerPoints=true
-            io.to(room.id).emit("players-points",room.getRoundPoints())
+            io.to(room.id).emit("players-points",{points:room.getRoundPoints(),drawerPoints:room.PlayerPoints.get(room.drawer).points})
             let isnotcanceled=await delay(5000,room.abortController.signal)
             room.showingPlayerPoints=false
             if(!isnotcanceled)

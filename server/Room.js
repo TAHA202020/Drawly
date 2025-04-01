@@ -148,6 +148,7 @@ module.exports= class Room{
     }
     getRoundPoints()
     {
+        this.PlayerPoints.set(this.drawer,{username:this.players.get(this.drawer).username,points:this.playerGuessed*30})
         this.players.forEach((_, key) => {
             if (!this.PlayerPoints.has(key)) {
               this.PlayerPoints.set(key, {username: this.players.get(key).username, points: 0});
