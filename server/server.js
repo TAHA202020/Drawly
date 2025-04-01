@@ -34,11 +34,12 @@ io.on("connection",(socket)=>
                         socket.emit("error",{message:"The Game is Full "})
                         return
                     }
+                let playerPoints=room.showingPlayerPoints?room.getRoundPoints():null
                 room.PlayerJoin(socket.id,data.username)
                 socket.room=room
                 socket.to(data.room_id).emit("player-joined",[socket.id,data.username,0])
                 socket.join(data.room_id)
-                socket.emit("room-joined",{roundCounter:room.roundCounter,number_of_rounds:room.NumberOfRounds,room_id:data.room_id, owner:false , players:room.getPlayersArray(), drawer:room.drawer&&{id:room.drawer,username:room.players.get(room.drawer).username.username},user:{id:socket.id,username:data.username} ,gameStarted:room.gameStarted, drawerChoosing:room.drawerChoosing,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null,wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime,showingPlayerPoints:room.showingPlayerPoints,showingRoundCounter:room.showingRoundCounter, playerPoints:room.showingPlayerPoints?room.getRoundPoints():null})
+                socket.emit("room-joined",{roundCounter:room.roundCounter,number_of_rounds:room.NumberOfRounds,room_id:data.room_id, owner:false , players:room.getPlayersArray(), drawer:room.drawer&&{id:room.drawer,username:room.players.get(room.drawer).username.username},user:{id:socket.id,username:data.username} ,gameStarted:room.gameStarted, drawerChoosing:room.drawerChoosing,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null,wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime,showingPlayerPoints:room.showingPlayerPoints,showingRoundCounter:room.showingRoundCounter, playerPoints:playerPoints})
                 
             }
             else
@@ -48,23 +49,37 @@ io.on("connection",(socket)=>
             }})
         socket.on("max-players",({maxPlayers})=>
             {
+                let room=socket.room
+                if(room===null || room.owner !==socket.id)
+                    return
                 socket.room.maxPlayers=maxPlayers
             })
         socket.on("round-timer",({roundTimer})=>
             {
+                let room=socket.room
+                if(room===null || room.owner !==socket.id)
+                    return
                 socket.room.maxRoundTimer=roundTimer
             })
         socket.on("word-timer",({wordtimer})=>
             {
+                let room=socket.room
+                if(room===null || room.owner !==socket.id)
+                    return
                 socket.room.maxWordPickingTimer=wordtimer
             })
             socket.on("max-rounds",({maxRounds})=>
             {
+                let room=socket.room
+                if(room===null || room.owner !==socket.id)
+                    return
                 socket.room.NumberOfRounds=maxRounds
             })
         /*Canvas Events*/
         socket.on("draw",(data)=>{
             let room =socket.room
+            if(socket.id!==room.drawer)
+                return
             socket.to(room.id).emit("draw",data)
         })
         socket.on("draw-start",(data)=>{
@@ -118,7 +133,7 @@ io.on("connection",(socket)=>
                             return
                         room.showingPlayerPoints=false
                         if(room.nextTurn()){
-                            startNewTurn(io,room)
+                            return startNewTurn(io,room)
                         }
                         else if(room.NextRound())
                         {
@@ -128,7 +143,7 @@ io.on("connection",(socket)=>
                             if(!isnotcanceled)
                                 return
                             this.showingRoundCounter=false
-                            startNewTurn(io,room)
+                            return startNewTurn(io,room)
                         }
                         else
                         {
@@ -173,7 +188,7 @@ io.on("connection",(socket)=>
                     room.drawerChoosing=false
                     io.to(room.drawer).emit("wordChosen", {word:room.wordstoChoose[0],roundmaxTimer:room.maxRoundTimer});
                     io.to(room.id).except(room.drawer).emit("wordLength", {wordLenght:room.wordtoDraw.length,roundmaxTimer:room.maxRoundTimer});
-                    startTurnTimer(io,room)
+                    return startTurnTimer(io,room)
                 }
                 room.wordChoosingTime--;
                 io.to(room.id).emit("word-timer",{time:room.wordChoosingTime});
@@ -212,13 +227,13 @@ io.on("connection",(socket)=>
                     io.to(room.id).emit("end-game")
                     
                 }
-                io.to(room.id).emit("player-left",{playerId:socket.id})
-                if(room.drawer===socket.id)
+                io.to(room.id).emit("player-left",{players:room.getPlayersArray()})
+                if(room.drawer===socket.id && !room.showingPlayerPoints && !room.showingRoundCounter)
                 {
                     clearInterval(room.wordChoosingTimer)
                     clearInterval(room.roundTimer)
                     room.wordtoDraw=null
-                    room.drawerChoosing=true
+                    room.drawerChoosing=false
                     room.wordChoosingTime=0
                     room.wordChoosingTimer=null
                     room.roundTime=0
@@ -233,7 +248,7 @@ io.on("connection",(socket)=>
                         return
                     room.showingPlayerPoints=false
                     if(room.nextTurn()){
-                        startNewTurn(io,room)
+                        return startNewTurn(io,room)
                     }
                     else if(room.NextRound())
                     {
@@ -243,7 +258,7 @@ io.on("connection",(socket)=>
                         if(!isnotcanceled)
                             return
                         room.showingRoundCounter=false
-                        startNewTurn(io,room)
+                        return startNewTurn(io,room)
                     }
                     else
                     {
@@ -307,8 +322,8 @@ function startTurnTimer(io,room)
             }
             else
             {
-                io.to(room.id).emit("end-game")
                 room.resetRoom()
+                io.to(room.id).emit("end-game")
             }
             
         }

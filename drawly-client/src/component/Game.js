@@ -42,6 +42,7 @@ function Game() {
       setMessages((prevMessages) => [...prevMessages, data]);
     }
     const handlePlayerJoined = (data) => {
+      console.log("player joined", data);
       setGame((prevGame) => {
         const isAlreadyAdded = prevGame.players.some(
           (player) => player[0] === data[0]
@@ -52,11 +53,8 @@ function Game() {
     };
 
     const handlePlayerLeft = (data) => {
-      console.log("player left", data);
       setGame((prevGame) => {
-        let newPLayer=prevGame.players.filter((player) => player[0] !== data.playerId)
-        console.log(newPLayer)
-        return {...prevGame,players: newPLayer}});
+        return {...prevGame,players: data.players}});
     };
 
     const handleOwnership = (data) => {
@@ -64,7 +62,10 @@ function Game() {
     };
 
     const handleWordsChoosing = (data) => {
-      clearCanvasRef.current.clearCanvas()
+      if(clearCanvasRef.current){
+        clearCanvasRef.current.clearCanvas()
+        return
+      }
       if (data.gameStarted) {
         setGame((prev) => ({ ...prev, gameStarted: true }));
       }
@@ -214,7 +215,7 @@ function Game() {
                 <Chronometer time={game.roundTime}/>
               </div>
             ) : null}
-            <Players game={game} />
+            <Players />
             <DrawingCanvas roundTime={game.roundTime} canDraw={game.drawer?game.drawer.id==game.user.id:false} ref={clearCanvasRef}/>
             <Chat messages={messages}/>
           </div>
@@ -243,11 +244,11 @@ function Game() {
           {/* Waiting Overlay for Non-Drawer Players - Fullscreen Overlay */}
           {game.drawerChoosing && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md h-full w-full z-40">
-              <p className="text-white text-2xl font-semibold">Waiting for {game.drawer.username} to choose a word...</p>
+              <p className="text-white text-2xl font-semibold">Waiting for {game.drawer?.username} to choose a word...</p>
             </div>
           )}
         </div>
-      ) : game.owner ? (<GameOwnerSettings game={game}/>
+      ) : game.owner ? (<GameOwnerSettings/>
       ) : (<div className="waiting-players">
         <div >Waiting for the owner to start the game </div>
         <span class="loader"></span>

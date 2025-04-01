@@ -2,9 +2,11 @@ import { useState } from "react"
 import { socket } from "../utils/socket"
 import ErrorMessage from "./ErrorMessage"
 import crown from "../assets/crown.gif"
-export default function GameOwnerSettings({game})
+import { useContext } from "react"
+import { GameContext } from "../context/GameContext"
+export default function GameOwnerSettings()
 {
-
+    const {game,setGame}=useContext(GameContext)
     const [maxPlayers,setMaxPlayers]=useState(8)
     const [roundTimer,setRoundTimer] =useState(90)
     const [wordpickingtimer,Setwordpickingtimer]=useState(10)
@@ -20,7 +22,7 @@ export default function GameOwnerSettings({game})
                             <div className="range-container">
                                 <span className="signs minus" onClick={()=>
                                   {
-                                    console.log(game.players)
+                                    
                                     if(maxPlayers==game.players.length || maxPlayers==2){
                                       return
                                     }
