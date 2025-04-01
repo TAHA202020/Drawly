@@ -22,7 +22,7 @@ module.exports= class Room{
         this.roundTime=0;
         this.wordChoosingTimer=null;
         this.roundTimer=null;
-        this.NumberOfRounds=1;
+        this.NumberOfRounds=3;
         this.roundCounter=0;
         this.wordstoChoose=[];
         this.playerGuessed=0;
@@ -143,11 +143,8 @@ module.exports= class Room{
     }
     resetPlayersPoints()
     {
-        this.players.forEach((_, key) => {
-            if (!this.PlayerPoints.has(key)) {
-              this.PlayerPoints.set(key, {username: this.players.get(key).username, points: 0});
-            }
-          });
+        this.players.forEach((_, key) => {this.players.set(key, {username: this.players.get(key).username, points: 0});})
+    
     }
     getRoundPoints()
     {

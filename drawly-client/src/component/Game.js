@@ -76,13 +76,11 @@ function Game() {
         drawer: data.drawer,
       }));
     };
-    const handleGameEnd=()=>
+    const handleGameEnd=(data)=>
     {
+      console.log(data.players)
       setGame(prevGame=>({...prevGame,gameStarted:false,drawer:null ,wordLenght:null,showingRoundCounter:false,showingPlayerPoints:false
-        , players:prevGame.players.map(player=>
-          {
-            return [player[0],player[1],0]
-          })
+        , players:data.players
       }))
       setWordToChoose([])
       setWordChosen(null)

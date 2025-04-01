@@ -2,6 +2,7 @@ const app=require("express")()
 const http=require("http").Server(app)
 const {Server}=require("socket.io")
 const Room =require("./Room")
+const { player } = require("./words")
 const port =process.env.PORT || 4000
 const io=new Server(http,{
     cors :{origin:"*"}
@@ -129,9 +130,10 @@ io.on("connection",(socket)=>
                         room.showingPlayerPoints=true
                         io.to(room.id).emit("players-points",room.getRoundPoints())
                         let isnotcanceled=await delay(5000,room.abortController.signal)
+                        room.showingPlayerPoints=false
                         if(!isnotcanceled)
                             return
-                        room.showingPlayerPoints=false
+                        
                         if(room.nextTurn()){
                             return startNewTurn(io,room)
                         }
@@ -140,15 +142,16 @@ io.on("connection",(socket)=>
                             room.startRound()
                             io.to(room.id).emit("new-round",{roundCounter:room.roundCounter})
                             let isnotcanceled=await delay(5000,room.abortController.signal)
+                            this.showingRoundCounter=false
                             if(!isnotcanceled)
                                 return
-                            this.showingRoundCounter=false
+                            
                             return startNewTurn(io,room)
                         }
                         else
                         {
                             room.resetRoom()
-                            io.to(room.id).emit("end-game")
+                            io.to(room.id).emit("end-game",{players:room.getPlayersArray()})
                         }
                     }
                     return
@@ -172,9 +175,10 @@ io.on("connection",(socket)=>
             room.startRound()
             io.to(room.id).emit("new-round",{roundCounter:room.roundCounter ,gameStarted:true})
             let isnotcanceled=await delay(5000,room.abortController.signal)
+            room.showingRoundCounter=false
             if(!isnotcanceled)
             return
-            room.showingRoundCounter=false
+            
             room.nextDrawer()
             io.to(socket.room.drawer).emit("words-choosing", {words:socket.room.wordstoChoose,gameStarted:true ,drawer:{id:room.drawer,username:room.players.get(room.drawer).username.username},maxWordPickingTimer:room.maxWordPickingTimer});
             io.to(socket.room.id).except(socket.room.drawer).emit("drawer-choosing",{gameStarted:true,drawer:{id:room.drawer,username:room.players.get(room.drawer).username.username},maxWordPickingTimer:room.maxWordPickingTimer});
@@ -224,7 +228,7 @@ io.on("connection",(socket)=>
                 if(room.players.size<2)
                 {
                     room.resetRoom()
-                    io.to(room.id).emit("end-game")
+                    io.to(room.id).emit("end-game",{players:room.getPlayersArray()})
                     return
                 }
                 
@@ -244,9 +248,10 @@ io.on("connection",(socket)=>
                     io.to(room.id).emit("players-points",room.emptyPlayerPoints())
                     await delay(5000,room.abortController.signal)
                     let isnotcanceled=await delay(5000,room.abortController.signal)
+                    room.showingPlayerPoints=false
                     if(!isnotcanceled)
                         return
-                    room.showingPlayerPoints=false
+                    
                     if(room.nextTurn()){
                         return startNewTurn(io,room)
                     }
@@ -255,15 +260,17 @@ io.on("connection",(socket)=>
                         room.startRound()
                         io.to(room.id).emit("new-round",{roundCounter:room.roundCounter})
                         let isnotcanceled=await delay(5000,room.abortController.signal)
+                        room.showingRoundCounter=false
                         if(!isnotcanceled)
                             return
-                        room.showingRoundCounter=false
+                        
                         return startNewTurn(io,room)
                     }
                     else
                     {
-                        io.to(room.id).emit("end-game")
                         room.resetRoom()
+                        io.to(room.id).emit("end-game",{players:room.getPlayersArray()})
+                        
                     }
                 }
             }
@@ -304,9 +311,10 @@ function startTurnTimer(io,room)
             room.showingPlayerPoints=true
             io.to(room.id).emit("players-points",room.getRoundPoints())
             let isnotcanceled=await delay(5000,room.abortController.signal)
+            room.showingPlayerPoints=false
             if(!isnotcanceled)
             return
-            room.showingPlayerPoints=false
+            
             if(room.nextTurn()){
                 startNewTurn(io,room)
             }
@@ -315,15 +323,16 @@ function startTurnTimer(io,room)
                 room.startRound()
                 io.to(room.id).emit("new-round",{roundCounter:room.roundCounter})
                 let isnotcanceled=await delay(5000,room.abortController.signal)
+                room.showingRoundCounter=false
                 if(!isnotcanceled)
                     return
-                room.showingRoundCounter=false
+                
                 startNewTurn(io,room)
             }
             else
             {
                 room.resetRoom()
-                io.to(room.id).emit("end-game")
+                io.to(room.id).emit("end-game",{players:room.getPlayersArray()})
             }
             
         }
