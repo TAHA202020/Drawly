@@ -64,7 +64,6 @@ function Game() {
     const handleWordsChoosing = (data) => {
       if(clearCanvasRef.current){
         clearCanvasRef.current.clearCanvas()
-        return
       }
       if (data.gameStarted) {
         setGame((prev) => ({ ...prev, gameStarted: true }));
