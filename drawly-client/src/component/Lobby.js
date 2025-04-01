@@ -18,6 +18,7 @@ export default function Lobby()
                 {
                     setUser({id:socket.id,username:data.user})
                     setGame(data)
+                    console.log(data)
                     navigate(`/${data.room_id}`)
                 })
             return()=>{socket.off("room-joined")}

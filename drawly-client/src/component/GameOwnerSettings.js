@@ -20,6 +20,7 @@ export default function GameOwnerSettings({game})
                             <div className="range-container">
                                 <span className="signs minus" onClick={()=>
                                   {
+                                    console.log(game.players)
                                     if(maxPlayers==game.players.length || maxPlayers==2){
                                       return
                                     }

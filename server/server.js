@@ -196,7 +196,7 @@ io.on("connection",(socket)=>
             if(room!==null)
             {
                 let newOwner=room.PlayerLeave(socket.id)
-                io.to(room.id).emit("player-left",{playerId:socket.id})
+                
                 if(room.players.size==0){
                     clearInterval(room.roundTimer)
                     clearInterval(room.wordChoosingTimer)
@@ -212,6 +212,7 @@ io.on("connection",(socket)=>
                     io.to(room.id).emit("end-game")
                     
                 }
+                io.to(room.id).emit("player-left",{playerId:socket.id})
                 if(room.drawer===socket.id)
                 {
                     clearInterval(room.wordChoosingTimer)

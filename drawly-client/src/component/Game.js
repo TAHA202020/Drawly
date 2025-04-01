@@ -23,7 +23,6 @@ function Game() {
   const [messages, setMessages] = useState([]);
   const [wordToChoose, setWordToChoose] = useState([]);
   const [wordChosen, setWordChosen] = useState(null);
-  
   useEffect(() => {
     if (user === null) {
       navigate("/?id=" + location.pathname.slice(1));
@@ -53,10 +52,11 @@ function Game() {
     };
 
     const handlePlayerLeft = (data) => {
-      setGame((prevGame) => ({
-        ...prevGame,
-        players: prevGame.players.filter((player) => player[0] !== data.playerId),
-      }));
+      console.log("player left", data);
+      setGame((prevGame) => {
+        let newPLayer=prevGame.players.filter((player) => player[0] !== data.playerId)
+        console.log(newPLayer)
+        return {...prevGame,players: newPLayer}});
     };
 
     const handleOwnership = (data) => {
@@ -83,13 +83,12 @@ function Game() {
     };
     const handleGameEnd=()=>
     {
-      let newplayers=[...game.players]
-      //reset players points
-      for(let i=0;i<newplayers.length;i++)
-      {
-        newplayers[i][2]=0
-      }
-      setGame(prevGame=>({...prevGame,gameStarted:false,drawer:null ,wordLenght:null, players:newplayers,showingRoundCounter:false,showingPlayerPoints:false}))
+      setGame(prevGame=>({...prevGame,gameStarted:false,drawer:null ,wordLenght:null,showingRoundCounter:false,showingPlayerPoints:false
+        , players:game.players.map(player=>
+          {
+            return [player[0],player[1],0]
+          })
+      }))
       setWordToChoose([])
       setWordChosen(null)
       setMessages([])
@@ -215,7 +214,7 @@ function Game() {
                 <Chronometer time={game.roundTime}/>
               </div>
             ) : null}
-            <Players />
+            <Players game={game} />
             <DrawingCanvas roundTime={game.roundTime} canDraw={game.drawer?game.drawer.id==game.user.id:false} ref={clearCanvasRef}/>
             <Chat messages={messages}/>
           </div>
