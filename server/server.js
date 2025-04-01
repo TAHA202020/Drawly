@@ -226,7 +226,7 @@ io.on("connection",(socket)=>
                 {
                     room.resetRoom()
                     io.to(room.id).emit("end-game")
-                    
+                    return
                 }
                 
                 if(room.drawer===socket.id && !room.showingPlayerPoints && !room.showingRoundCounter)

@@ -8,7 +8,7 @@ import stickgif from "../assets/stick-man.gif"
 export default function GameOwnerSettings()
 {
     document.title = 'Drawly - Room Settings';
-    const {game,setGame}=useContext(GameContext)
+    const {game}=useContext(GameContext)
     const [maxPlayers,setMaxPlayers]=useState(8)
     const [roundTimer,setRoundTimer] =useState(90)
     const [wordpickingtimer,Setwordpickingtimer]=useState(10)
