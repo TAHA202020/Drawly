@@ -42,7 +42,6 @@ function Game() {
       setMessages((prevMessages) => [...prevMessages, data]);
     }
     const handlePlayerJoined = (data) => {
-      console.log("player joined", data);
       setGame((prevGame) => {
         return { ...prevGame, players: data };
       });
@@ -220,13 +219,13 @@ function Game() {
             
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md h-full w-full z-50">
               <div className="bg-white bg-opacity-80 p-6 rounded-xl shadow-lg text-center">
-                <h2 className="text-lg font-bold mb-4">Pick a word to draw</h2>
+                <h2 className="text-2xl font-bold mb-4">Pick a word to draw</h2>
                 <div className="flex gap-3">
                   {wordToChoose.map((word, index) => (
                     <button
                       key={index}
                       onClick={() => handleWordChoice(word)}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition"
+                      className="px-4 py-2 bg-blue-500 text-white text-md rounded-lg hover:bg-blue-700 transition roboto-font"
                     >
                       {word}
                     </button>

@@ -4,6 +4,7 @@ import ErrorMessage from "./ErrorMessage"
 import crown from "../assets/crown.gif"
 import { useContext } from "react"
 import { GameContext } from "../context/GameContext"
+import stickgif from "../assets/stick-man.gif"
 export default function GameOwnerSettings()
 {
     document.title = 'Drawly - Room Settings';
@@ -14,6 +15,9 @@ export default function GameOwnerSettings()
     return(<>
     <ErrorMessage/>
     <div className="settings relative">
+      <div className="stick-man">
+        {Array.from({ length: game.players.length }, (_, index) => (<img src={stickgif} key={index} className="stick-man-gif"/>))}
+      </div>
       <img src={crown} alt="crown" className="absolute top-0 left-0 crown" />
       <div className="flex items-center-justify-center flex-col">
               <p>You are the owner. Click to start the game.</p>

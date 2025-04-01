@@ -26,7 +26,7 @@ export default function Chat({messages}) {
       </div>
       <div className="flex-1 overflow-y-auto overflow-x-hidden max-h-full chat-scroll" ref={chatRef}>
         {messages.map((msg, index) => (
-          <div key={index} className={`flex items-center gap-2 message-bg p-1 w-full ${msg.color}`} ><p className="font-bold text-sm">{msg.name} : </p><p className="text-sm">{msg.message}</p></div>
+          <div key={index} className={`flex items-center gap-2 message-bg p-1 w-full ${msg.color} ` } ><p className="font-bold text-sm roboto-font">{msg.name} : </p><p className="text-sm roboto-font" >{msg.message}</p></div>
         ))}
       </div>
       <input

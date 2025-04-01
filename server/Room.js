@@ -10,7 +10,7 @@ module.exports= class Room{
         this.turnsQueue=null;
         this.PlayerPoints=new Map();
         this.maxRoundTimer=90
-        this.maxWordPickingTimer=15
+        this.maxWordPickingTimer=10
         this.players=new Map();
         this.maxPlayers=8;
         this.id=id;
@@ -124,7 +124,7 @@ module.exports= class Room{
         this.resetPlayersPoints()
         this.PlayerPoints=new Map();
         this.maxRoundTimer=90
-        this.maxWordPickingTimer=15
+        this.maxWordPickingTimer=10
         this.maxPlayers=8;
         this.gameStarted=false;
         this.drawerChoosing=false;

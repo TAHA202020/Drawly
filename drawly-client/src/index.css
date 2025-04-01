@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap');
 
 *
@@ -256,11 +256,11 @@
       opacity: 0;
   }
   10% {
-    transform: translate(-50%,0);
+    transform: translate(-50%,10%);
       opacity: 1;
   }
   90% {
-    transform: translate(-50%,0);
+    transform: translate(-50%,10%);
       opacity: 1;
   }
   100% {
@@ -371,21 +371,23 @@
   }
   .round
   {
-    animation: slideDown 0.4s ease-in-out forwards;
+    animation: slideDown 0.2s ease-in-out forwards;
     height: 100vh;
     width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgb(211, 211, 211, 0.5);
+    background-color: rgb(211, 211, 211, 0.7);
     position: absolute;
     top: 0;
     left: 0;
     z-index: 50;
+    font-size: xx-large;
+    color: black;
   }
   .player-points
   {
-    animation: slideDown 0.4s ease-in-out forwards;
+    animation: slideDown 0.2s ease-in-out forwards;
     height: 100vh;
     width: 100vw;
     display: flex;
@@ -405,3 +407,28 @@
     font-weight: 700;
   }
   
+.roboto-font
+{
+  font-family: "Roboto", sans-serif;
+}
+
+.stick-man
+{
+  width: 100%;
+  top: 0;
+  left: 0;
+  transform: translateY(-110%);
+  position: absolute;
+  height: 50px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: end;
+}
+.stick-man-gif
+{
+  background-color: white;
+  padding: 5px;
+  height: 100%;
+  border-radius: 2px;
+}

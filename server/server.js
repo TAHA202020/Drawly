@@ -13,7 +13,7 @@ io.on("connection",(socket)=>
         socket.room=null
         socket.on("create-room",(data)=>{
             if(data.username===""){
-                socket.emit("error",{message:"Please enter a Name a Zebi"})
+                socket.emit("error",{message:"Please Enter a Username"})
                 return
             }
             if(data.room_id===null)
@@ -31,7 +31,7 @@ io.on("connection",(socket)=>
                 let room=Rooms.get(data.room_id)
                 if(room.maxPlayers==room.players.size)
                     {
-                        socket.emit("error",{message:"The Game is Full "})
+                        socket.emit("error",{message:"The Game is Full"})
                         return
                     }
                 let playerPoints=room.showingPlayerPoints?room.getRoundPoints():null
@@ -166,7 +166,7 @@ io.on("connection",(socket)=>
             let room=socket.room
             if(room.players.size<=1)
             {
-                socket.emit("error",{message:"can't start the game with one player"})
+                socket.emit("error",{message:"Not Enough Players"})
                 return ;
             }
             room.setGameStarted(true)
