@@ -37,7 +37,7 @@ io.on("connection",(socket)=>
                 let playerPoints=room.showingPlayerPoints?room.getRoundPoints():null
                 room.PlayerJoin(socket.id,data.username)
                 socket.room=room
-                socket.to(data.room_id).emit("player-joined",[socket.id,data.username,0])
+                socket.to(data.room_id).emit("player-joined",room.getPlayersArray())
                 socket.join(data.room_id)
                 socket.emit("room-joined",{roundCounter:room.roundCounter,number_of_rounds:room.NumberOfRounds,room_id:data.room_id, owner:false , players:room.getPlayersArray(), drawer:room.drawer&&{id:room.drawer,username:room.players.get(room.drawer).username.username},user:{id:socket.id,username:data.username} ,gameStarted:room.gameStarted, drawerChoosing:room.drawerChoosing,wordLenght:room.wordtoDraw?room.wordtoDraw.length:null,wordchoosingTime:room.wordChoosingTime,roundTime:room.roundTime,showingPlayerPoints:room.showingPlayerPoints,showingRoundCounter:room.showingRoundCounter, playerPoints:playerPoints})
                 
@@ -211,6 +211,7 @@ io.on("connection",(socket)=>
             if(room!==null)
             {
                 let newOwner=room.PlayerLeave(socket.id)
+                io.to(room.id).emit("player-left",{players:room.getPlayersArray()})
                 
                 if(room.players.size==0){
                     clearInterval(room.roundTimer)
@@ -227,7 +228,7 @@ io.on("connection",(socket)=>
                     io.to(room.id).emit("end-game")
                     
                 }
-                io.to(room.id).emit("player-left",{players:room.getPlayersArray()})
+                
                 if(room.drawer===socket.id && !room.showingPlayerPoints && !room.showingRoundCounter)
                 {
                     clearInterval(room.wordChoosingTimer)

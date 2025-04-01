@@ -44,11 +44,7 @@ function Game() {
     const handlePlayerJoined = (data) => {
       console.log("player joined", data);
       setGame((prevGame) => {
-        const isAlreadyAdded = prevGame.players.some(
-          (player) => player[0] === data[0]
-        );
-        if (isAlreadyAdded) return prevGame;
-        return { ...prevGame, players: [...prevGame.players, data] };
+        return { ...prevGame, players: data };
       });
     };
 
@@ -140,17 +136,17 @@ function Game() {
     };
     const handleRoundPoints=(data)=>
     {
-      setGame((prevGame)=>({...prevGame,wordLenght:null,playerPoints:data,drawer:null ,showingPlayerPoints:true,showingRoundCounter:false}))
+      setGame((prevGame)=>({...prevGame,wordLenght:null,playerPoints:data,drawer:null ,showingPlayerPoints:true,showingRoundCounter:false, drawerChoosing:false}))
       setWordChosen(null)
     }
     const handleNewRound = (data) => 
       {
         if(data.gameStarted) {
-          setGame((prev) => ({ ...prev, gameStarted: true, roundCounter: data.roundCounter,showingRoundCounter:true,showingPlayerPoints:false ,playerPoints:[] }));
+          setGame((prev) => ({ ...prev, gameStarted: true, roundCounter: data.roundCounter,showingRoundCounter:true,showingPlayerPoints:false ,playerPoints:[], drawerChoosing:false }));
         }
         else
         {
-          setGame((prev => ({ ...prev, roundCounter: data.roundCounter,showingRoundCounter:true ,showingPlayerPoints:false ,playerPoints:[]})));
+          setGame((prev => ({ ...prev, roundCounter: data.roundCounter,showingRoundCounter:true ,showingPlayerPoints:false ,playerPoints:[], drawerChoosing:false})));
         }
       }
     socket.on("new-round",handleNewRound)
