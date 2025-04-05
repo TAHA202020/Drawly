@@ -246,7 +246,7 @@ io.on("connection",(socket)=>
                     room.abortController.abort()
                     room.abortController=new AbortController()
                     room.showingPlayerPoints=true
-                    io.to(room.id).emit("players-points",{points:room.emptyPlayerPoints()})
+                    io.to(room.id).emit("players-points",{points:room.room.getRoundPoints()})
                     await delay(5000,room.abortController.signal)
                     let isnotcanceled=await delay(5000,room.abortController.signal)
                     room.showingPlayerPoints=false

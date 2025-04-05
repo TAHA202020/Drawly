@@ -22,7 +22,7 @@ function Game() {
   const playerjoinedAudio=new Audio(join)
   const showPointsAudio=new Audio(showpointsAudio)
   const playerleftAudio=new Audio(left)
-  const guessedRightAudio =new Audio(guessedRight)
+  const guessedRightAudio=new Audio(guessedRight)
   const turnStartAudio=new Audio(turnStart)
   const clearCanvasRef=useRef(null)
   const { game, setGame } = useContext(GameContext);
@@ -36,34 +36,41 @@ function Game() {
     if (user === null) {
       navigate("/?id=" + location.pathname.slice(1));
     }
-    
+    playerjoinedAudio.load()
+    showPointsAudio.load()
+    playerleftAudio.load()
+    guessedRightAudio.load()
+    turnStartAudio.load()
     const handleMessage=(data) => {
       let newdata={...data}
       delete data.points
       delete data.id
       if(newdata.points)
         {
+          guessedRightAudio.play()
           setGame((prevGame)=>({...prevGame,players:prevGame.players.map(item =>{
             return item[0] == newdata.id ? [item[0], item[1], item[2] + newdata.points] : item
           })}))
-          guessedRightAudio.play()
+          
         }
       
       setMessages((prevMessages) => [...prevMessages, data]);
     }
     const handlePlayerJoined = (data) => {
+      playerjoinedAudio.play()
       setGame((prevGame) => {
         return { ...prevGame, players: data };
       });
-      playerjoinedAudio.play()
+      
     };
 
     const handlePlayerLeft = (data) => {
+      playerleftAudio.play()
       setGame((prevGame) => {
         return {...prevGame,players: data.players}});
       if(game.gameStarted)
         setMessages((prevMessages) => [...prevMessages, {name:"Server",message:`${data.playerLeft} has left the game`,color:"yellow"}]);
-      playerleftAudio.play()
+      
     };
 
     const handleOwnership = (data) => {
@@ -120,6 +127,7 @@ function Game() {
     };
 
     const handleWordChosen = (data) => {
+      turnStartAudio.play()
       setWordChosen(data.word);
       setWordToChoose([]);
       setGame((prev) => ({
@@ -127,17 +135,18 @@ function Game() {
         drawerChoosing: false,
         roundTime: data.roundmaxTimer,
       }));
-      turnStartAudio.play()
+      
     };
 
     const handleWordLength = (data) => {
+      turnStartAudio.play()
       setGame((prev) => ({
         ...prev,
         wordLenght: data.wordLenght,
         drawerChoosing: false,
         roundTime: data.roundmaxTimer,
       }));
-      turnStartAudio.play()
+      
     };
 
     const handleWordTimer = (data) => {
@@ -149,6 +158,7 @@ function Game() {
     };
     const handleRoundPoints=(data)=>
     {
+      showPointsAudio.play()
       setGame((prevGame)=>({
         ...prevGame,wordLenght:null,
         playerPoints:data.points,
@@ -161,7 +171,7 @@ function Game() {
         }):prevGame.players
       }))
       setWordChosen(null)
-      showPointsAudio.play()
+      
     }
     const handleNewRound = (data) => 
       {

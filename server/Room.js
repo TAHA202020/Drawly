@@ -53,6 +53,8 @@ module.exports= class Room{
     PlayerLeave(id)
     {
         this.players.delete(id)
+        if(this.PlayerPoints.has(id))
+            this.PlayerPoints.delete(id)
         if(this.Queue)
             this.Queue.remove(id)
         if(this.owner===id)
@@ -66,10 +68,6 @@ module.exports= class Room{
     getPlayersArray()
     {
         return [...this.players].map(([id, { username, points }]) => [id, username, points])
-    }
-    emptyPlayerPoints()
-    {
-        return [...this.players].map(([id, { username }]) => [id, username, 0])
     }
 
 
