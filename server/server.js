@@ -173,7 +173,7 @@ io.on("connection",(socket)=>
             }
             room.setGameStarted(true)
             room.startRound()
-            io.to(room.id).emit("new-round",{roundCounter:room.roundCounter ,gameStarted:true})
+            io.to(room.id).emit("new-round",{roundCounter:room.roundCounter, maxRounds:room.NumberOfRounds ,gameStarted:true})
             let isnotcanceled=await delay(5000,room.abortController.signal)
             room.showingRoundCounter=false
             if(!isnotcanceled)

@@ -176,7 +176,7 @@ function Game() {
     const handleNewRound = (data) => 
       {
         if(data.gameStarted) {
-          setGame((prev) => ({ ...prev, gameStarted: true, roundCounter: data.roundCounter,showingRoundCounter:true,showingPlayerPoints:false ,playerPoints:[], drawerChoosing:false }));
+          setGame((prev) => ({ ...prev, gameStarted: true, roundCounter: data.roundCounter,number_of_rounds:data.maxRounds,showingRoundCounter:true,showingPlayerPoints:false ,playerPoints:[], drawerChoosing:false }));
         }
         else
         {

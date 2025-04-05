@@ -21,7 +21,7 @@ const DrawingCanvas = forwardRef(({ canDraw},ref) => {
 
     socket.on("draw-start", (data) => {
       context.beginPath();
-      context.lineWidth = 5;
+      context.lineWidth = 4;
       context.strokeStyle = data.color;
       context.moveTo(data.x, data.y);
     });
@@ -29,7 +29,7 @@ const DrawingCanvas = forwardRef(({ canDraw},ref) => {
     socket.on("draw-end", (data) => {
       context.beginPath();
       context.strokeStyle = data.color;
-      context.arc(data.x, data.y, 3, 0, Math.PI * 2);
+      context.arc(data.x, data.y, 2, 0, Math.PI * 2);
       context.fillStyle = data.color;
       context.fill();
       context.closePath();
@@ -92,7 +92,7 @@ const DrawingCanvas = forwardRef(({ canDraw},ref) => {
     const context = canvas.getContext("2d");
     context.strokeStyle = selectedColor;
     context.beginPath();
-    context.lineWidth = 5;
+    context.lineWidth = 4;
     context.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     socket.emit("draw-start", { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY ,color:selectedColor});
     setIsDrawing(true);
@@ -116,7 +116,7 @@ const DrawingCanvas = forwardRef(({ canDraw},ref) => {
     const context = e.target.getContext("2d");
     context.strokeStyle = selectedColor;
     context.beginPath();
-    context.arc(e.nativeEvent.offsetX, e.nativeEvent.offsetY, 2.5, 0, Math.PI * 2);
+    context.arc(e.nativeEvent.offsetX, e.nativeEvent.offsetY, 2, 0, Math.PI * 2);
     context.fillStyle = selectedColor;
     context.fill();
     context.closePath();

@@ -7,7 +7,7 @@ export default function Players()
     return(<div className="player-container w-[9vw]">
         {game.players.map(([id,name,points])=>
         <div className="player" key={id}>
-            <div className="flex gap-2 items-center justify-around w-full">
+            <div className="flex gap-2 items-end justify-around w-full">
                 <h3 className="player-name">{name}</h3>
                 <h3>{points}</h3>
             </div>
