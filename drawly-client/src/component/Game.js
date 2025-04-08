@@ -36,11 +36,6 @@ function Game() {
     if (user === null) {
       navigate("/?id=" + location.pathname.slice(1));
     }
-    playerjoinedAudio.load()
-    showPointsAudio.load()
-    playerleftAudio.load()
-    guessedRightAudio.load()
-    turnStartAudio.load()
     const handleMessage=(data) => {
       let newdata={...data}
       delete data.points
